@@ -93,7 +93,23 @@ try {
     })`));
   }
 
-  const requiredTargets = ['comics.html', 'cards.html', 'collectibles.html', 'about.html', 'visit.html'];
+  await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
+  await send('Page.navigate', { url: `${baseUrl}/` });
+  await delay(300);
+  const desktop = await evaluate(send, `(() => {
+    const nav = document.querySelector('.site-nav');
+    const toggle = document.querySelector('.menu-toggle');
+    return {
+      viewportWidth: window.innerWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+      navDisplay: getComputedStyle(nav).display,
+      toggleDisplay: getComputedStyle(toggle).display,
+      navLinks: [...nav.querySelectorAll('a')].map((link) => link.getAttribute('href'))
+    };
+  })()`);
+
+  const requiredTargets = ['index.html', 'comics.html', 'cards.html', 'collectibles.html', 'about.html', 'visit.html'];
   const navigationOk = home.expanded === 'true'
     && home.menuOpen
     && home.bodyLocked
@@ -101,11 +117,16 @@ try {
     && home.scrollWidth <= home.clientWidth
     && requiredTargets.every((targetName) => home.navLinks.includes(targetName));
   const pagesOk = pageResults.every((page) => page.title && page.hasMain && page.hasNav && page.scrollWidth <= page.clientWidth);
+  const desktopOk = desktop.viewportWidth === 1440
+    && desktop.scrollWidth <= desktop.clientWidth
+    && desktop.navDisplay !== 'none'
+    && desktop.toggleDisplay === 'none'
+    && requiredTargets.every((targetName) => desktop.navLinks.includes(targetName));
 
-  console.log(JSON.stringify({ navigationOk, pagesOk, mobileMenu: home, pages: pageResults }, null, 2));
+  console.log(JSON.stringify({ navigationOk, pagesOk, desktopOk, mobileMenu: home, desktopNavigation: desktop, pages: pageResults }, null, 2));
   socket.close();
   chrome.kill();
-  if (!navigationOk || !pagesOk) process.exit(1);
+  if (!navigationOk || !pagesOk || !desktopOk) process.exit(1);
 } catch (error) {
   chrome.kill();
   console.error(error.stack || error.message);

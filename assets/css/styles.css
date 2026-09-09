@@ -138,6 +138,28 @@ button, input { font: inherit; }
 .visit-strip__detail span { display: block; margin-top: .2rem; font-size: .95rem; }
 .visit-strip .button { justify-self: start; }
 
+.visit-section { padding: clamp(4.5rem, 8vw, 7.5rem) 0; background: var(--blue); color: var(--white); }
+.visit-section .section-intro { color: #dce0ff; }
+.visit-shop-grid { display: grid; grid-template-columns: 1.05fr 1.02fr .86fr; gap: 1.25rem; margin-top: 3rem; }
+.visit-shop-card { min-height: 23rem; padding: 1.7rem; border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); }
+.visit-shop-card__label { display: block; margin-bottom: 2.5rem; font-family: "DM Mono", monospace; font-size: .69rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+.visit-shop-card--details { display: flex; flex-direction: column; background: var(--yellow); color: var(--ink); }
+.visit-shop-card--details address { font-family: "Barlow Condensed", Impact, sans-serif; font-size: clamp(2.2rem, 3.2vw, 3.4rem); font-style: normal; font-weight: 900; letter-spacing: -.04em; line-height: .88; text-transform: uppercase; }
+.visit-shop-card__contact { display: grid; gap: .3rem; margin-top: 1.4rem; }
+.visit-shop-card__contact a { font-family: "DM Mono", monospace; font-size: .76rem; font-weight: 500; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.visit-shop-card--details .button { width: 100%; margin-top: auto; }
+.visit-shop-card--hours { background: var(--ink); color: var(--white); }
+.home-hours { display: grid; gap: .44rem; margin: 0; }
+.home-hours div { display: flex; justify-content: space-between; gap: .8rem; padding-bottom: .44rem; border-bottom: 1px solid rgba(255,255,255,.23); font-size: .82rem; }
+.home-hours dt { font-weight: 700; }
+.home-hours dd { margin: 0; color: #d5d8e4; text-align: right; }
+.visit-shop-card--social { display: flex; flex-direction: column; background: var(--coral); color: var(--ink); }
+.visit-shop-card--social h3 { margin: 0; font-family: "Barlow Condensed", Impact, sans-serif; font-size: 3rem; font-weight: 900; letter-spacing: -.045em; line-height: .87; text-transform: uppercase; }
+.visit-shop-card--social p { margin: 1.2rem 0 0; font-size: .93rem; }
+.visit-shop-card__social-links { display: grid; gap: .7rem; margin-top: auto; }
+.visit-shop-card__social-links a { display: flex; justify-content: space-between; padding-top: .65rem; border-top: 2px solid var(--ink); font-family: "DM Mono", monospace; font-size: .72rem; font-weight: 500; text-decoration: none; text-transform: uppercase; }
+.visit-shop-card__social-links a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
 .page-hero { position: relative; overflow: hidden; padding: clamp(4rem, 8vw, 6.4rem) 0 clamp(3.4rem, 7vw, 5.5rem); border-bottom: 2px solid var(--ink); background: var(--white); }
 .page-hero--blue { background: var(--blue); color: var(--white); }
 .page-hero--yellow { background: var(--yellow); }
@@ -226,11 +248,14 @@ button, input { font: inherit; }
 
 .site-footer { padding: 3.4rem 0 1.5rem; background: var(--ink); color: var(--white); }
 .footer-grid { display: grid; grid-template-columns: 1.1fr .75fr .8fr; gap: 2.5rem; }
+.footer-grid--home { grid-template-columns: 1.05fr .72fr .8fr .8fr; }
 .site-footer .brand { color: var(--white); }
 .footer-summary { max-width: 23rem; margin: 1.25rem 0 0; color: #c7cad6; font-size: .9rem; }
 .footer-title { margin: .2rem 0 1rem; color: var(--yellow); font-family: "DM Mono", monospace; font-size: .69rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+.footer-title--spaced { margin-top: 1.8rem; }
 .footer-links { display: grid; gap: .55rem; }
 .footer-links a { color: #d8dae3; font-size: .88rem; text-decoration: none; }
+.footer-hours { color: #d8dae3; font-size: .78rem; line-height: 1.45; }
 .footer-links a:hover { color: var(--yellow); text-decoration: underline; text-underline-offset: 3px; }
 .footer-bottom { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.4rem; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,.2); color: #a8adbd; font-family: "DM Mono", monospace; font-size: .65rem; letter-spacing: .025em; text-transform: uppercase; }
 
@@ -256,6 +281,8 @@ button, input { font: inherit; }
   .category-card__graphic { height: 62%; }
   .owner-portrait { width: min(86%, 27rem); }
   .visit-strip .button { margin-top: .3rem; }
+  .visit-shop-grid { grid-template-columns: 1fr 1fr; }
+  .visit-shop-card--social { grid-column: 1 / -1; min-height: 16rem; }
   .editorial-card-grid { grid-template-columns: 1fr; }
   .story-panel__art { min-height: 21rem; }
   .story-panel__copy { padding: 2.2rem; }
@@ -275,6 +302,10 @@ button, input { font: inherit; }
   .feature-list li { grid-template-columns: 1.8rem 1fr; gap: .6rem; }
   .feature-list svg { display: none; }
   .callout { grid-template-columns: 1fr; }
+  .visit-shop-grid { grid-template-columns: 1fr; }
+  .visit-shop-card, .visit-shop-card--social { grid-column: auto; min-height: auto; }
+  .visit-shop-card--details { min-height: 23rem; }
+  .visit-shop-card--social { min-height: 17rem; }
   .footer-grid { grid-template-columns: 1fr; }
   .footer-grid > :first-child { grid-column: auto; }
   .footer-bottom { display: grid; }

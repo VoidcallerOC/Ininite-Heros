@@ -4,7 +4,7 @@ import { join, relative } from 'node:path';
 const root = process.cwd();
 const htmlFiles = [];
 const requiredPages = ['index.html', 'comics.html', 'cards.html', 'collectibles.html', 'about.html', 'visit.html'];
-const requiredNavTargets = ['comics.html', 'cards.html', 'collectibles.html', 'about.html', 'visit.html'];
+const requiredNavTargets = ['index.html', 'comics.html', 'cards.html', 'collectibles.html', 'about.html', 'visit.html'];
 
 function walk(directory) {
   for (const entry of readdirSync(directory)) {
