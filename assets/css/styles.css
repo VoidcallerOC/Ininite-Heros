@@ -264,7 +264,9 @@ button, input { font: inherit; }
   .section-title { font-size: clamp(2.6rem, 13vw, 3.8rem); }
   .hero__actions, .hero__actions .button { width: 100%; }
   .button { width: 100%; }
-  .hero__photo, .page-hero__visual { aspect-ratio: 4 / 3; }
+  .page-hero__visual { aspect-ratio: 4 / 3; }
+  .hero__photo { aspect-ratio: auto; height: auto; }
+  .hero__photo img { width: 100%; height: auto; object-fit: contain; }
   .inside-gallery { gap: .7rem; }
   .gallery-item figcaption { display: none; }
   .visit-shop-grid { grid-template-columns: 1fr; }
