@@ -305,4 +305,4 @@ button, input { font: inherit; }
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
 
-.hero__grid:has(> :only-child), .page-hero__grid:has(> :only-child) { grid-template-columns: 1fr; }
+.hero__grid:has(> :only-child), .page-hero__grid:has(> :only-child), .story-panel:has(> :only-child), .owner-grid:has(> :only-child) { grid-template-columns: 1fr; }
