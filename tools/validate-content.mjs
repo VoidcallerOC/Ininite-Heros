@@ -16,7 +16,6 @@ for (const page of pages) {
     ['canonical URL', /<link\s+rel=["']canonical["']\s+href=["']https:\/\/infiniteheroes\.net\//i],
     ['Open Graph title', /<meta\s+property=["']og:title["']\s+content=["'][^"']+["']/i],
     ['Open Graph description', /<meta\s+property=["']og:description["']\s+content=["'][^"']+["']/i],
-    ['Open Graph image', /<meta\s+property=["']og:image["']\s+content=["']https:\/\/infiniteheroes\.net\/assets\/images\/shop-interior-wide-social\.jpg["']/i],
     ['Twitter card', /<meta\s+name=["']twitter:card["']\s+content=["']summary_large_image["']/i],
     ['linked supplied logo', /<a\s+class=["']brand["']\s+href=["']index\.html["'][^>]*>\s*<img[^>]+src=["']assets\/images\/infinite-heroes-logo\.webp["']/i],
   ]) {
@@ -44,7 +43,6 @@ const schemaBlock = home.match(/<script\s+type=["']application\/ld\+json["']>([\
 try {
   const schema = JSON.parse(schemaBlock || '');
   if (schema['@type'] !== 'Store' || schema.name !== 'Infinite Heroes Comics') errors.push('index.html: invalid Store structured data');
-  if (schema.image !== 'https://infiniteheroes.net/assets/images/shop-interior-wide-social.jpg') errors.push('index.html: structured data image is missing');
 } catch {
   errors.push('index.html: invalid JSON-LD structured data');
 }

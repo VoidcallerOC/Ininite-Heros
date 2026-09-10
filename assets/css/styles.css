@@ -304,3 +304,5 @@ button, input { font: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
+
+.hero__grid:has(> :only-child), .page-hero__grid:has(> :only-child) { grid-template-columns: 1fr; }

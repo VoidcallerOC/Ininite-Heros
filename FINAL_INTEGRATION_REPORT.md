@@ -11,7 +11,6 @@ All supplied image assets were converted to locally hosted, web-optimized WebP f
 | Asset group | Local files | Website use |
 | --- | --- | --- |
 | Brand mark | `assets/images/infinite-heroes-logo.webp` | Linked header and footer brand mark on every page; browser icon reference |
-| Shop interior | `shop-interior-wide.webp`, `shop-interior-wide-social.jpg` | Homepage hero, About and Visit page imagery, Open Graph / structured-data social image |
 | Store detail gallery | `shop-detail-1.webp` through `shop-detail-4.webp` | Homepage “Inside Infinite Heroes” editorial gallery and Visit page supporting visual |
 | Comics | `new-comics.webp`, `dc-comics.webp`, `marvel-comics.webp`, `wall-books-and-graphic-novels.webp` | Homepage category presentation, Comics page hero and four category panels, About imagery |
 | Other categories | `trading-cards.webp`, `collectibles-and-statues.webp` | Homepage category cards and dedicated Trading Cards / Collectibles page heroes |
