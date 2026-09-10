@@ -307,7 +307,7 @@ button, input { font: inherit; }
 .stacked-words { line-height: .82; }
 .category-card__title, .photo-feature h3, .editorial-card h3, .feature-list h3 { line-height: .94; }
 .site-nav a { color: var(--white); }
-.site-nav a.nav-cta { color: var(--paper) !important; }
+.site-nav a.nav-cta { border-color: var(--yellow); background: var(--yellow); color: var(--ink) !important; box-shadow: 4px 4px 0 var(--coral); }
 .visit-card--address { color: var(--ink); }
 .content-section--paper-deep .section-intro, .content-section--paper-deep .editorial-card p { color: var(--ink-soft); }
 .visit-section { background: var(--ink); color: var(--white); }
