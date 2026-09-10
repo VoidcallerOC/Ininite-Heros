@@ -302,6 +302,11 @@ button, input { font: inherit; }
 }
 
 /* Editorial refinement: fewer boxes, more space, and more visual rhythm. */
+.display, .section-title, .stacked-words, .category-card__title, .editorial-card h3, .photo-feature h3, .visit-card h2, .visit-shop-card--details address, .visit-shop-card--social h3, .feature-list h3 { font-family: Manrope, Arial, sans-serif; font-weight: 800; letter-spacing: -.065em; }
+.display { line-height: .86; }
+.section-title { line-height: .92; }
+.stacked-words { line-height: .82; }
+.category-card__title, .photo-feature h3, .editorial-card h3, .feature-list h3 { line-height: .94; }
 .site-nav a { color: var(--white); }
 .site-nav a.nav-cta { color: var(--paper) !important; }
 .visit-card--address { color: var(--ink); }
