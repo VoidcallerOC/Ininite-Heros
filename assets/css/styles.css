@@ -271,7 +271,8 @@ button, input { font: inherit; }
   .inside-gallery { grid-template-columns: repeat(2, 1fr); max-width: 42rem; }
   .owner-photo { width: min(86%, 27rem); }
   .photo-feature-grid, .editorial-card-grid { grid-template-columns: 1fr; }
-  .story-panel__image { min-height: 21rem; }
+  .story-panel__image { min-height: 0; aspect-ratio: 1600 / 944; }
+  .story-panel__image img { width: 100%; height: auto; object-fit: contain; }
   .story-panel__copy { padding: 2.4rem; }
   .visit-grid { grid-template-columns: 1fr; }
   .visit-photo { min-height: 19rem; }
