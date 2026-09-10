@@ -4,27 +4,40 @@
 
   if (!toggle || !nav) return;
 
-  const closeMenu = () => {
-    nav.classList.remove('is-open');
-    document.body.classList.remove('menu-open');
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.setAttribute('aria-label', 'Open navigation menu');
+  const desktopQuery = window.matchMedia('(min-width: 821px)');
+
+  const setMenuState = (isOpen, returnFocus = false) => {
+    const isDesktop = desktopQuery.matches;
+    nav.classList.toggle('is-open', !isDesktop && isOpen);
+    document.body.classList.toggle('menu-open', !isDesktop && isOpen);
+    toggle.setAttribute('aria-expanded', String(!isDesktop && isOpen));
+    toggle.setAttribute('aria-label', !isDesktop && isOpen ? 'Close navigation menu' : 'Open navigation menu');
+
+    if (isDesktop) {
+      nav.removeAttribute('aria-hidden');
+      nav.removeAttribute('inert');
+    } else {
+      nav.setAttribute('aria-hidden', String(!isOpen));
+      nav.toggleAttribute('inert', !isOpen);
+    }
+
+    if (returnFocus) toggle.focus();
   };
 
+  const closeMenu = (returnFocus = false) => setMenuState(false, returnFocus);
+
   toggle.addEventListener('click', () => {
-    const isOpen = nav.classList.toggle('is-open');
-    document.body.classList.toggle('menu-open', isOpen);
-    toggle.setAttribute('aria-expanded', String(isOpen));
-    toggle.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+    const isOpen = !nav.classList.contains('is-open');
+    setMenuState(isOpen);
   });
 
-  nav.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
+  nav.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => closeMenu()));
 
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeMenu();
+    if (event.key === 'Escape' && nav.classList.contains('is-open')) closeMenu(true);
   });
 
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 820) closeMenu();
-  });
+  const syncMenu = () => setMenuState(false);
+  desktopQuery.addEventListener('change', syncMenu);
+  syncMenu();
 })();
