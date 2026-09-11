@@ -1,6 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap");
 
-/* FORGE CT family alignment — Infinite Heroes stays yellow, not pink. */
+/* FORGE CT family language.
+   Shared: dark floor, DM Sans, status pill, pill CTAs, numbered eyebrows.
+   Unique: yellow wordmark / gold accent — not pink, not Forge gray. */
 
 :root {
   --ink: #070708;
@@ -24,12 +26,20 @@ body {
 }
 
 .site-header {
-  background: rgba(7, 7, 8, .88);
-  border-bottom-color: rgba(243, 239, 230, .08);
+  background: rgba(7, 7, 8, .92);
+  border-bottom: 1px solid rgba(243, 239, 230, .08);
+}
+
+.brand__logo {
+  max-height: 42px;
+  width: auto;
+  object-fit: contain;
 }
 
 .site-nav a {
   color: #d7d3cb;
+  font-size: .86rem;
+  letter-spacing: .04em;
 }
 
 .site-nav a.nav-cta,
@@ -39,6 +49,7 @@ body {
   background: var(--yellow);
   color: #070708 !important;
   box-shadow: none;
+  font-weight: 700;
 }
 
 .nav-cta:hover {
@@ -50,10 +61,13 @@ body {
 .button {
   border-radius: 999px;
   letter-spacing: .08em;
+  font-weight: 700;
 }
 
 .button--primary {
   border: 0;
+  background: var(--yellow);
+  color: #070708;
   box-shadow: none;
 }
 
@@ -66,18 +80,49 @@ body {
 .button--secondary {
   border-radius: 999px;
   border-color: rgba(243, 239, 230, .28);
+  color: #f3efe6;
+}
+
+.button--dark {
+  border-radius: 999px;
+  background: var(--yellow);
+  color: #070708;
+  border: 0;
 }
 
 .hero {
   background:
-    radial-gradient(ellipse at top, rgba(232, 201, 76, .12), transparent 46%),
+    radial-gradient(ellipse at top left, rgba(232, 201, 76, .14), transparent 48%),
     #070708;
-  border-bottom-color: rgba(243, 239, 230, .08);
+  border-bottom: 1px solid rgba(243, 239, 230, .08);
 }
 
 .hero::before,
 .hero::after {
-  opacity: .35;
+  opacity: .28;
+}
+
+.hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+  gap: 2.4rem;
+  align-items: center;
+}
+
+.hero__photo {
+  margin: 0;
+  border-radius: 1.15rem;
+  overflow: hidden;
+  border: 1px solid rgba(243, 239, 230, .1);
+  background: #101114;
+}
+
+.hero__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 4 / 5;
 }
 
 .status-pill {
@@ -106,6 +151,20 @@ body {
 
 .eyebrow {
   color: #c9ab3a;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  font-size: .72rem;
+  font-weight: 600;
+}
+
+.display {
+  letter-spacing: -.04em;
+  font-weight: 700;
+}
+
+.display em {
+  font-style: italic;
+  color: var(--yellow);
 }
 
 .home-intro,
@@ -136,16 +195,12 @@ body {
   color: #14151a;
 }
 
-.intro-card {
-  background: #f3efe6;
-  box-shadow: none;
-  border-color: transparent;
-}
-
+.intro-card,
 .category-card {
   background: #f3efe6;
   box-shadow: none;
   border-color: transparent;
+  border-radius: 1.15rem;
 }
 
 .category-card:hover {
@@ -153,11 +208,39 @@ body {
   box-shadow: 0 16px 32px rgba(0, 0, 0, .28);
 }
 
+.category-card__number {
+  font-family: "DM Mono", ui-monospace, monospace;
+  letter-spacing: .1em;
+  color: #8a5a12;
+}
+
 .category-card__title,
 .photo-feature h3,
 .editorial-card h3,
 .feature-list h3 {
   color: #14151a;
+}
+
+.owner-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .8fr);
+  gap: 2rem;
+  align-items: center;
+}
+
+.owner-photo {
+  margin: 0;
+  border-radius: 1.15rem;
+  overflow: hidden;
+  border: 1px solid rgba(243, 239, 230, .1);
+}
+
+.owner-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 4 / 5;
 }
 
 .visit-shop-card {
@@ -178,7 +261,7 @@ body {
 .visit-shop-card--social {
   background: #1a120f;
   color: #f3efe6;
-  border-color: rgba(232, 201, 76, .24);
+  border: 1px solid rgba(232, 201, 76, .24);
 }
 
 .visit-shop-card--social h3,
@@ -189,6 +272,11 @@ body {
 
 .visit-shop-card__social-links a {
   border-top-color: rgba(243, 239, 230, .16);
+}
+
+.visit-card--address {
+  background: var(--yellow);
+  color: #14151a;
 }
 
 .page-hero--yellow {
@@ -203,4 +291,26 @@ body {
 
 .page-hero--blue {
   background: #101114;
+}
+
+.cta-band {
+  background: #101114;
+  border-top: 1px solid rgba(243, 239, 230, .08);
+}
+
+.feature-list__number {
+  font-family: "DM Mono", ui-monospace, monospace;
+  color: var(--yellow-soft);
+}
+
+@media (max-width: 860px) {
+  .hero__grid,
+  .owner-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero__photo img,
+  .owner-photo img {
+    aspect-ratio: 16 / 10;
+  }
 }
