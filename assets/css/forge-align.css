@@ -1,0 +1,206 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
+
+/* FORGE CT family alignment — Infinite Heroes stays yellow, not pink. */
+
+:root {
+  --ink: #070708;
+  --ink-raised: #101114;
+  --paper: #0c0d10;
+  --paper-deep: #14151a;
+  --white: #f3efe6;
+  --ink-soft: #b7b4ae;
+  --slate: #8f8c86;
+  --yellow: #e8c94c;
+  --yellow-soft: #c9ab3a;
+  --coral: #e5674d;
+  --blue: #5270e6;
+  --blue-deep: #3046c2;
+}
+
+body {
+  background: #070708;
+  color: #f3efe6;
+  font-family: "DM Sans", Manrope, Arial, sans-serif;
+}
+
+.site-header {
+  background: rgba(7, 7, 8, .88);
+  border-bottom-color: rgba(243, 239, 230, .08);
+}
+
+.site-nav a {
+  color: #d7d3cb;
+}
+
+.site-nav a.nav-cta,
+.nav-cta {
+  border: 0;
+  border-radius: 999px;
+  background: var(--yellow);
+  color: #070708 !important;
+  box-shadow: none;
+}
+
+.nav-cta:hover {
+  background: #f3d76a;
+  transform: none;
+  box-shadow: none;
+}
+
+.button {
+  border-radius: 999px;
+  letter-spacing: .08em;
+}
+
+.button--primary {
+  border: 0;
+  box-shadow: none;
+}
+
+.button--primary:hover {
+  transform: none;
+  box-shadow: none;
+  filter: brightness(1.06);
+}
+
+.button--secondary {
+  border-radius: 999px;
+  border-color: rgba(243, 239, 230, .28);
+}
+
+.hero {
+  background:
+    radial-gradient(ellipse at top, rgba(232, 201, 76, .12), transparent 46%),
+    #070708;
+  border-bottom-color: rgba(243, 239, 230, .08);
+}
+
+.hero::before,
+.hero::after {
+  opacity: .35;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  margin: 0 0 1.15rem;
+  padding: .45rem .8rem;
+  border: 1px solid rgba(243, 239, 230, .14);
+  border-radius: 999px;
+  background: rgba(16, 17, 20, .86);
+  color: #d7d3cb;
+  font-family: "DM Mono", ui-monospace, monospace;
+  font-size: .68rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.status-pill__dot {
+  width: .5rem;
+  height: .5rem;
+  border-radius: 50%;
+  background: #e5674d;
+  box-shadow: 0 0 0 4px rgba(229, 103, 77, .16);
+}
+
+.eyebrow {
+  color: #c9ab3a;
+}
+
+.home-intro,
+.owner-section,
+.content-section,
+.page-hero {
+  background: #0c0d10;
+}
+
+.category-section,
+.content-section--paper-deep {
+  background: #101114;
+  border-color: rgba(243, 239, 230, .08);
+}
+
+.inside-section,
+.site-footer,
+.visit-section,
+.page-hero--ink {
+  background: #070708;
+}
+
+.intro-card,
+.category-card,
+.editorial-card,
+.photo-feature,
+.content-grid__aside {
+  color: #14151a;
+}
+
+.intro-card {
+  background: #f3efe6;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.category-card {
+  background: #f3efe6;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, .28);
+}
+
+.category-card__title,
+.photo-feature h3,
+.editorial-card h3,
+.feature-list h3 {
+  color: #14151a;
+}
+
+.visit-shop-card {
+  border-radius: 1.15rem;
+  box-shadow: none;
+}
+
+.visit-shop-card--details {
+  background: var(--yellow);
+  color: #14151a;
+}
+
+.visit-shop-card--hours {
+  background: #101114;
+  color: #f3efe6;
+}
+
+.visit-shop-card--social {
+  background: #1a120f;
+  color: #f3efe6;
+  border-color: rgba(232, 201, 76, .24);
+}
+
+.visit-shop-card--social h3,
+.visit-shop-card--social p,
+.visit-shop-card--social a {
+  color: #f3efe6;
+}
+
+.visit-shop-card__social-links a {
+  border-top-color: rgba(243, 239, 230, .16);
+}
+
+.page-hero--yellow {
+  background: var(--yellow);
+  color: #14151a;
+}
+
+.page-hero--coral {
+  background: #1a120f;
+  color: #f3efe6;
+}
+
+.page-hero--blue {
+  background: #101114;
+}
