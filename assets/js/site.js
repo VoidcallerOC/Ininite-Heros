@@ -11,7 +11,7 @@
   };
   const statusFormatter = new Intl.DateTimeFormat('en-US', {
     timeZone: SHOP_TIME_ZONE,
-    weekday: 'long',
+    weekday: 'short',
     hour: 'numeric',
     minute: '2-digit',
     hour12: false,
