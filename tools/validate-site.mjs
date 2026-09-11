@@ -26,6 +26,8 @@ function resolveLocalReference(sourceFile, reference) {
   const cleanReference = reference.split('#')[0].split('?')[0];
   if (!cleanReference || cleanReference.startsWith('mailto:') || cleanReference.startsWith('tel:')) return null;
   if (/^(https?:|\/\/|#|data:|javascript:)/i.test(cleanReference)) return null;
+  // Skip Vercel-provided paths (analytics, insights, etc.)
+  if (cleanReference.startsWith('/_vercel/')) return null;
   return cleanReference.startsWith('/')
     ? join(root, cleanReference.replace(/^\/+/, ''))
     : join(sourceFile, '..', cleanReference);
