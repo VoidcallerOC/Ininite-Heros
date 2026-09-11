@@ -1,8 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap");
 
-/* FORGE CT family language.
-   Shared: dark floor, DM Sans, status pill, pill CTAs, numbered eyebrows.
-   Unique: yellow wordmark / gold accent — not pink, not Forge gray. */
+/* FORGE CT family.
+   Shared: ink floor #070708, DM Sans + DM Mono, status pill, pill CTAs, numbered eyebrows.
+   Unique to Infinite Heroes: gold #e8c94c wordmark accent. Not Sunny pink. Not Hard Hittin red. */
 
 :root {
   --ink: #070708;
@@ -301,6 +301,11 @@ body {
 .feature-list__number {
   font-family: "DM Mono", ui-monospace, monospace;
   color: var(--yellow-soft);
+}
+
+.page-hero .eyebrow,
+.cta-band .eyebrow {
+  font-family: "DM Mono", ui-monospace, monospace;
 }
 
 @media (max-width: 860px) {
