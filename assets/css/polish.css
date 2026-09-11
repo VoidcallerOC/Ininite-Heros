@@ -1,0 +1,44 @@
+/* Light client polish */
+.intro-card,
+.category-card,
+.editorial-card,
+.photo-feature,
+.content-grid__aside {
+  color: var(--ink);
+}
+.category-card__title,
+.photo-feature h3,
+.editorial-card h3 {
+  color: var(--ink);
+}
+.hero__grid {
+  grid-template-columns: minmax(0, 1.05fr) minmax(18rem, .9fr);
+}
+.owner-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.visit-shop-card--details {
+  background: var(--yellow) !important;
+  color: var(--ink) !important;
+  border-color: var(--ink);
+}
+.visit-shop-card--details address,
+.visit-shop-card--details .visit-shop-card__label {
+  color: var(--ink) !important;
+}
+.visit-shop-card--hours {
+  background: var(--ink-raised) !important;
+  color: var(--white) !important;
+}
+.visit-shop-card--social {
+  background: var(--coral) !important;
+  color: var(--ink) !important;
+}
+.visit-shop-card--social h3 {
+  color: var(--ink) !important;
+}
+.site-header .brand__logo {
+  width: 8.25rem;
+}
