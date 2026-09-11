@@ -149,6 +149,11 @@ body {
   box-shadow: 0 0 0 4px rgba(229, 103, 77, .16);
 }
 
+.status-pill--open .status-pill__dot {
+  background: #67c587;
+  box-shadow: 0 0 0 4px rgba(103, 197, 135, .16);
+}
+
 .eyebrow {
   color: #c9ab3a;
   letter-spacing: .16em;
