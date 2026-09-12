@@ -44,3 +44,19 @@ export const fallbackCatalogSections: Record<'comics' | 'collectibles', CatalogS
     { id: 'fallback-collectibles-floor', catalog_type: 'collectibles', title: 'WHAT IS ON THE FLOOR', description: 'Inventory moves. Call or stop in before you drive for one piece.', image_url: '/assets/images/shop-detail-4.webp', image_alt: 'Collectibles on the shop floor at Infinite Heroes Comics', cta_label: 'Plan your visit', cta_href: '/visit.html', sort_order: 30, enabled: true, created_at: '', updated_at: '' },
   ],
 };
+
+
+export const fallbackCardsContent: import('@/lib/cms').CardsContent = {
+  id: 'default', eyebrow: '01 — The card table', title: 'Find your next pull.', description: 'Trading cards have a place at Infinite Heroes. Find the games, events, and community that are part of the shop.',
+  magic_eyebrow: '02 — Infinite Heroes Magic', magic_title: 'A WPN store with a Friday table.', magic_description: 'Infinite Heroes is a Wizards Play Network store built around playing together, learning the formats, and showing up for the next release.', magic_event_wording: 'Friday Night Magic, Commander, and a table for the local community.', magic_event_time: '7:30 PM', magic_event_frequency: 'Every Friday', magic_prerelease_text: 'Prerelease events happen for every new Magic release. Check the latest announcement or contact the shop for details.', announcement: 'Magic announcements and event details are updated here by the shop.', featured_game_slug: 'magic', updated_at: 'fallback',
+};
+
+
+export const fallbackCardGames: import('@/lib/cms').CardGame[] = [
+  { id: 'fallback-magic', name: 'Magic: The Gathering', slug: 'magic', description: 'WPN-supported Magic play, Commander nights, Friday Night Magic, and prerelease events for every new release.', image_url: '/assets/images/trading-cards.webp', image_alt: 'Magic: The Gathering cards at Infinite Heroes Comics', cta_label: 'Explore Magic', cta_href: '#magic', active: true, sort_order: 10 },
+  { id: 'fallback-pokemon', name: 'Pokémon', slug: 'pokemon', description: 'Pokémon cards and the current trading-card scene at Infinite Heroes.', image_url: '/assets/images/trading-cards.webp', image_alt: 'Pokémon trading cards at Infinite Heroes Comics', cta_label: 'Ask at the counter', cta_href: '/visit.html', active: true, sort_order: 20 },
+  { id: 'fallback-lorcana', name: 'Lorcana', slug: 'lorcana', description: 'Disney Lorcana for collectors, players, and the next great pull.', image_url: '/assets/images/shop-detail-1.webp', image_alt: 'Trading cards at Infinite Heroes Comics', cta_label: 'See what is in stock', cta_href: '/visit.html', active: true, sort_order: 30 },
+  { id: 'fallback-star-wars', name: 'Star Wars', slug: 'star-wars', description: 'Star Wars cards and collectibles for fans of a galaxy far, far away.', image_url: '/assets/images/shop-detail-2.webp', image_alt: 'Star Wars collectibles at Infinite Heroes Comics', cta_label: 'Browse the shop', cta_href: '/visit.html', active: true, sort_order: 40 },
+  { id: 'fallback-yu-gi-oh', name: 'Yu-Gi-Oh!', slug: 'yu-gi-oh', description: 'Yu-Gi-Oh! cards and the current card conversation at Infinite Heroes.', image_url: '/assets/images/shop-detail-3.webp', image_alt: 'Trading cards at Infinite Heroes Comics', cta_label: 'Ask about cards', cta_href: '/visit.html', active: true, sort_order: 50 },
+  { id: 'fallback-more', name: 'More', slug: 'more', description: 'The card scene changes. Ask the shop what just arrived and what is being played next.', image_url: '/assets/images/shop-detail-4.webp', image_alt: 'Card display at Infinite Heroes Comics', cta_label: 'Contact the shop', cta_href: '/visit.html', active: true, sort_order: 60 },
+];

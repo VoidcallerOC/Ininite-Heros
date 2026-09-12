@@ -62,8 +62,19 @@ export const cardGameSchema = z.object({
   slug: z.string().trim().toLowerCase().regex(/^[a-z0-9-]+$/, 'Use lowercase letters, numbers, and hyphens only.').max(80),
   description: requiredText('Description', 700),
   image_url: optionalUrl.optional(),
+  image_alt: z.string().trim().max(250).nullable().optional(),
+  cta_label: z.string().trim().max(100).nullable().optional(),
+  cta_href: z.string().trim().max(300).nullable().optional(),
   active: z.boolean(),
   sort_order: z.coerce.number().int().min(0).max(999),
+});
+
+export const cardsContentSchema = z.object({
+  id: z.literal('default').optional(),
+  eyebrow: requiredText('Cards eyebrow', 120), title: requiredText('Cards title', 180), description: requiredText('Cards description', 1200),
+  magic_eyebrow: requiredText('Magic eyebrow', 120), magic_title: requiredText('Magic title', 180), magic_description: requiredText('Magic description', 1200),
+  magic_event_wording: requiredText('Magic event wording', 500), magic_event_time: requiredText('Magic event time', 120), magic_event_frequency: requiredText('Magic event frequency', 120), magic_prerelease_text: requiredText('Magic prerelease text', 500),
+  announcement: z.string().trim().max(500).nullable().optional(), featured_game_slug: z.string().trim().max(80).nullable().optional(),
 });
 
 const dateTimeLocal = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, 'Choose a valid local date and time.');

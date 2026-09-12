@@ -2,7 +2,7 @@
 
 This repository contains the production CMS foundation for the **Infinite Heroes Comics** website. It replaces the former static HTML site with a Vercel-ready **Next.js App Router** application backed by **Supabase Auth and Postgres**. The public experience retains the existing emerald-and-black design system, authentic store photography, existing `.html` URLs, accessibility patterns, canonical metadata, and business details. Site content is now seeded in and retrieved from Postgres; it is not the primary source in hard-coded HTML files.
 
-Phase 2 global business and homepage editing workflows are documented in [PHASE2.md](./PHASE2.md). Phase 3 persistent media operations are documented in [PHASE3.md](./PHASE3.md). Phase 4 Comics and Collectibles content management is documented in [PHASE4.md](./PHASE4.md).
+Phase 2 global business and homepage editing workflows are documented in [PHASE2.md](./PHASE2.md). Phase 3 persistent media operations are documented in [PHASE3.md](./PHASE3.md). Phase 4 Comics and Collectibles content management is documented in [PHASE4.md](./PHASE4.md). Phase 5 Cards and Magic content management is documented in [PHASE5.md](./PHASE5.md).
 
 ## Architecture
 

@@ -1,7 +1,7 @@
 import 'server-only';
 
-import type { BusinessHour, CardGame, CatalogSection, CatalogType, CmsPageData, MediaAsset, PageSection, PublicSiteData, SocialLink, StoreEvent } from '@/lib/cms';
-import { fallbackPublicSiteData, fallbackPages, fallbackCatalogSections } from '@/lib/fallback-content';
+import type { BusinessHour, CardGame, CardsContent, CatalogSection, CatalogType, CmsPageData, MediaAsset, PageSection, PublicSiteData, SocialLink, StoreEvent } from '@/lib/cms';
+import { fallbackPublicSiteData, fallbackPages, fallbackCatalogSections, fallbackCardsContent, fallbackCardGames } from '@/lib/fallback-content';
 import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server';
 
 function resolveMediaValue(value: unknown, mediaById: Map<string, string>, mediaByUrl: Map<string, string>): unknown {
@@ -49,10 +49,21 @@ export async function getPublishedPage(slug: string): Promise<CmsPageData | null
 }
 
 export async function getActiveCardGames(): Promise<CardGame[]> {
-  if (!isSupabaseConfigured()) return [];
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase.from('card_games').select('*').eq('active', true).order('sort_order');
-  return (data ?? []) as CardGame[];
+  if (!isSupabaseConfigured()) return fallbackCardGames;
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.from('card_games').select('*').eq('active', true).order('sort_order');
+    return error || !data?.length ? fallbackCardGames : data as CardGame[];
+  } catch { return fallbackCardGames; }
+}
+
+export async function getCardsContent(): Promise<CardsContent> {
+  if (!isSupabaseConfigured()) return fallbackCardsContent;
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.from('card_page_content').select('*').eq('id', 'default').maybeSingle();
+    return error || !data ? fallbackCardsContent : data as CardsContent;
+  } catch { return fallbackCardsContent; }
 }
 
 export async function getCatalogSections(catalogType: CatalogType): Promise<CatalogSection[]> {

@@ -7,7 +7,7 @@ import { requireAdmin } from '@/lib/auth';
 import type { ActionState, Json, MediaAsset } from '@/lib/cms';
 import { createSupabaseServerClient } from '@/lib/supabase-server';
 import { getMediaUsage } from '@/lib/media-usage';
-import { cardGameSchema, catalogSectionSchema, eventSchema, formBoolean, homeAnnouncementSchema, homeCtaSchema, homeHeroSchema, homeIntroSchema, homeSectionSchema, hourSchema, mediaSchema, nullableFormValue, pageSchema, sectionSchema, settingsSchema, socialSchema } from '@/lib/validation';
+import { cardGameSchema, cardsContentSchema, catalogSectionSchema, eventSchema, formBoolean, homeAnnouncementSchema, homeCtaSchema, homeHeroSchema, homeIntroSchema, homeSectionSchema, hourSchema, mediaSchema, nullableFormValue, pageSchema, sectionSchema, settingsSchema, socialSchema } from '@/lib/validation';
 
 const success = (message: string): ActionState => ({ status: 'success', message });
 const failure = (message: string): ActionState => ({ status: 'error', message });
@@ -172,14 +172,21 @@ export async function deleteCatalogSection(_state: ActionState, formData: FormDa
 }
 
 export async function saveCardGame(_state: ActionState, formData: FormData): Promise<ActionState> {
-  const parsed = cardGameSchema.safeParse({ id: nullableFormValue(formData, 'id') || undefined, name: formData.get('name'), slug: formData.get('slug'), description: formData.get('description'), image_url: nullableFormValue(formData, 'image_url'), active: formBoolean(formData, 'active'), sort_order: formData.get('sort_order') });
+  const parsed = cardGameSchema.safeParse({ id: nullableFormValue(formData, 'id') || undefined, name: formData.get('name'), slug: formData.get('slug'), description: formData.get('description'), image_url: nullableFormValue(formData, 'image_url'), image_alt: nullableFormValue(formData, 'image_alt'), cta_label: nullableFormValue(formData, 'cta_label'), cta_href: nullableFormValue(formData, 'cta_href'), active: formBoolean(formData, 'active'), sort_order: formData.get('sort_order') });
   if (!parsed.success) return failure(validationMessage(parsed.error));
+  if (parsed.data.image_url && !nullableFormValue(formData, 'image_alt')) return failure('Image alt text is required when a card game has an image.');
   try { const supabase = await adminClient(); const { id, ...values } = parsed.data; const { error } = await (id ? supabase.from('card_games').update(values).eq('id', id) : supabase.from('card_games').insert(values)); if (error) return failure(error.code === '23505' ? 'A card game with that URL slug already exists.' : 'The card game could not be saved.'); revalidatePublic(); return success('Card game saved.'); } catch { return failure('Authorization failed.'); }
 }
 
 export async function deleteCardGame(_state: ActionState, formData: FormData): Promise<ActionState> {
   const id = nullableFormValue(formData, 'id'); if (!id) return failure('Missing card game ID.');
   try { const { error } = await (await adminClient()).from('card_games').delete().eq('id', id); if (error) return failure('The card game could not be deleted.'); revalidatePublic(); return success('Card game deleted.'); } catch { return failure('Authorization failed.'); }
+}
+
+export async function saveCardsContent(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const parsed = cardsContentSchema.safeParse({ id: 'default', eyebrow: formData.get('eyebrow'), title: formData.get('title'), description: formData.get('description'), magic_eyebrow: formData.get('magic_eyebrow'), magic_title: formData.get('magic_title'), magic_description: formData.get('magic_description'), magic_event_wording: formData.get('magic_event_wording'), magic_event_time: formData.get('magic_event_time'), magic_event_frequency: formData.get('magic_event_frequency'), magic_prerelease_text: formData.get('magic_prerelease_text'), announcement: nullableFormValue(formData, 'announcement'), featured_game_slug: nullableFormValue(formData, 'featured_game_slug') });
+  if (!parsed.success) return failure(validationMessage(parsed.error));
+  try { const supabase = await adminClient(); const { error } = await supabase.from('card_page_content').upsert(parsed.data, { onConflict: 'id' }); if (error) return failure('Cards page content could not be saved.'); revalidatePublic(); return success('Cards page content saved and public routes revalidated.'); } catch { return failure('Authorization failed.'); }
 }
 
 export async function saveEvent(_state: ActionState, formData: FormData): Promise<ActionState> {

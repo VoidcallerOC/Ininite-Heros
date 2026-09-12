@@ -82,8 +82,29 @@ export type CardGame = {
   slug: string;
   description: string;
   image_url: string | null;
+  image_alt: string | null;
+  cta_label: string | null;
+  cta_href: string | null;
   active: boolean;
   sort_order: number;
+  updated_at?: string;
+};
+
+export type CardsContent = {
+  id: 'default';
+  eyebrow: string;
+  title: string;
+  description: string;
+  magic_eyebrow: string;
+  magic_title: string;
+  magic_description: string;
+  magic_event_wording: string;
+  magic_event_time: string;
+  magic_event_frequency: string;
+  magic_prerelease_text: string;
+  announcement: string | null;
+  featured_game_slug: string | null;
+  updated_at?: string;
 };
 
 export type StoreEvent = {
