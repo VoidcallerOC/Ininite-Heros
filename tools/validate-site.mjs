@@ -7,11 +7,15 @@ const requiredFiles = [
   'app/layout.tsx', 'app/page.tsx', 'app/admin/(protected)/layout.tsx', 'app/admin/login/page.tsx',
   'app/admin/actions.ts', 'app/api/analytics/route.ts', 'app/api/admin/media/upload/route.ts',
   'lib/auth.ts', 'lib/authorization.ts', 'lib/public-data.ts', 'proxy.ts',
-  'supabase/migrations/20260912103000_cms_foundation.sql', '.env.example', 'vercel.json',
+  'supabase/migrations/20260912103000_cms_foundation.sql', 'supabase/migrations/20260912110000_global_content_management.sql', '.env.example', 'vercel.json',
+  'app/admin/(protected)/homepage/page.tsx', 'components/homepage-editor.tsx', 'lib/fallback-content.ts',
 ];
 for (const file of requiredFiles) if (!existsSync(join(root, file))) errors.push(`Missing required CMS file: ${file}`);
 
 const migration = existsSync(join(root, 'supabase/migrations/20260912103000_cms_foundation.sql')) ? readFileSync(join(root, 'supabase/migrations/20260912103000_cms_foundation.sql'), 'utf8') : '';
+const phase2Migration = existsSync(join(root, 'supabase/migrations/20260912110000_global_content_management.sql')) ? readFileSync(join(root, 'supabase/migrations/20260912110000_global_content_management.sql'), 'utf8') : '';
+if (!phase2Migration.includes('create table public.content_revisions')) errors.push('Phase 2 migration missing content revision history.');
+if (!phase2Migration.includes("'business_description'")) errors.push('Phase 2 migration missing editable business description seed.');
 for (const table of ['profiles', 'site_settings', 'pages', 'page_sections', 'media', 'card_games', 'events', 'social_links', 'business_hours', 'analytics_events']) {
   if (!new RegExp(`create table public\\.${table}`, 'i').test(migration)) errors.push(`Database migration missing table: ${table}`);
   if (!new RegExp(`alter table public\\.${table} enable row level security`, 'i').test(migration)) errors.push(`Database migration missing RLS enablement: ${table}`);

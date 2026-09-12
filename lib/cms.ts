@@ -25,11 +25,21 @@ export type PageSection = {
   page_id: string;
   key: string;
   label: string;
-  section_type: string;
+  section_type: 'hero' | 'rich-text' | 'feature-list' | 'image-gallery' | 'call-to-action' | 'cards' | 'events' | 'hours' | 'announcement';
   content: Record<string, Json>;
   sort_order: number;
   published: boolean;
   updated_at: string;
+};
+
+export type ContentRevision = {
+  id: string;
+  entity_type: 'site_settings' | 'pages' | 'page_sections' | 'social_links' | 'business_hours';
+  entity_id: string;
+  label: string;
+  snapshot: Json;
+  created_by: string | null;
+  created_at: string;
 };
 
 export type MediaAsset = {

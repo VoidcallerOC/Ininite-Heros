@@ -2,11 +2,13 @@
 
 This repository contains the production CMS foundation for the **Infinite Heroes Comics** website. It replaces the former static HTML site with a Vercel-ready **Next.js App Router** application backed by **Supabase Auth and Postgres**. The public experience retains the existing emerald-and-black design system, authentic store photography, existing `.html` URLs, accessibility patterns, canonical metadata, and business details. Site content is now seeded in and retrieved from Postgres; it is not the primary source in hard-coded HTML files.
 
+Phase 2 global business and homepage editing workflows are documented in [PHASE2.md](./PHASE2.md).
+
 ## Architecture
 
 | Layer | Implementation | Responsibility |
 | --- | --- | --- |
-| Public web application | Next.js 15 App Router | Renders each public page from published CMS records while preserving `/comics.html`, `/cards.html`, `/collectibles.html`, `/about.html`, and `/visit.html`. |
+| Public web application | Next.js 16 App Router | Renders each public page from published CMS records while preserving `/comics.html`, `/cards.html`, `/collectibles.html`, `/about.html`, and `/visit.html`. |
 | Content database | Supabase Postgres | Stores settings, pages, sections, media metadata, card games, events, social links, hours, profiles, and analytics events. |
 | Authentication | Supabase Auth magic links | Sends passwordless sign-in links; users must also hold an explicitly assigned `admin` profile role. |
 | Authorization | Server action guards + Postgres RLS | Each CMS mutation calls `requireAdmin`; Postgres independently restricts writes and analytics reads to `admin` accounts. |

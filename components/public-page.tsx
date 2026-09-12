@@ -27,6 +27,11 @@ function Cta({ content }: { content: Record<string, Json> }) {
   return <section className="cta-band"><div className="container cta-band__grid"><div><p className="eyebrow">{contentString(content, 'eyebrow')}</p><h2 className="section-title">{contentString(content, 'title')}</h2>{contentString(content, 'body') && <p>{contentString(content, 'body')}</p>}</div><Link className="button button--dark" href={contentString(content, 'buttonHref', '/visit.html')}>{contentString(content, 'buttonLabel', 'Visit the shop')}</Link></div></section>;
 }
 
+function Announcement({ content }: { content: Record<string, Json> }) {
+  if (content.enabled !== true) return null;
+  return <section className="cta-band homepage-announcement"><div className="container cta-band__grid"><div><p className="eyebrow">{contentString(content, 'eyebrow')}</p><h2 className="section-title">{contentString(content, 'title')}</h2><p>{contentString(content, 'body')}</p></div><Link className="button button--dark" href={contentString(content, 'buttonHref', '/visit.html')}>{contentString(content, 'buttonLabel', 'Visit the shop')}</Link></div></section>;
+}
+
 function HomeIntro({ content }: { content: Record<string, Json> }) {
   const lines = contentStrings(content, 'titleLines');
   const paragraphs = contentStrings(content, 'body');
@@ -68,5 +73,5 @@ function VisitDetails({ content, data }: { content: Record<string, Json>; data: 
 export function PublicPage({ pageData, siteData, page, games = [] }: { pageData: CmsPageData; siteData: PublicSiteData; page: string; games?: CardGame[]; events?: StoreEvent[] }) {
   const sections = pageData.sections;
   const get = (key: string) => sections.find((section) => section.key === key)?.content ?? {};
-  return <SiteShell currentPage={page} data={siteData}><main id="main-content">{page === 'home' ? <><Hero content={get('hero')} home /><HomeIntro content={get('intro')} /><HomeCategories content={get('categories')} /><Gallery content={get('gallery')} /><HomeOwner content={get('owner')} /><HomeVisit content={get('visit')} data={siteData} /></> : <><Hero content={get('hero')} />{page === 'visit' ? <VisitDetails content={get('details')} data={siteData} /> : <>{get('owner-story').title ? <RichText content={get('owner-story')} about /> : get('features').title ? <FeatureList content={get('features')} /> : null}{page === 'cards' && <CardGames content={get('games')} games={games} />}<Cta content={get('cta')} /></>}</>}</main></SiteShell>;
+  return <SiteShell currentPage={page} data={siteData}><main id="main-content">{page === 'home' ? <><Hero content={get('hero')} home /><Announcement content={get('announcement')} /><HomeIntro content={get('intro')} /><HomeCategories content={get('categories')} /><Gallery content={get('gallery')} /><HomeOwner content={get('owner')} /><HomeVisit content={get('visit')} data={siteData} /><Cta content={get('cta')} /></> : <><Hero content={get('hero')} />{page === 'visit' ? <VisitDetails content={get('details')} data={siteData} /> : <>{get('owner-story').title ? <RichText content={get('owner-story')} about /> : get('features').title ? <FeatureList content={get('features')} /> : null}{page === 'cards' && <CardGames content={get('games')} games={games} />}<Cta content={get('cta')} /></>}</>}</main></SiteShell>;
 }

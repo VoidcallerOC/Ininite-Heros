@@ -23,7 +23,7 @@ export const sectionSchema = z.object({
   page_id: z.string().uuid(),
   key: z.string().trim().regex(/^[a-z0-9-]+$/, 'Use lowercase letters, numbers, and hyphens only.').max(80),
   label: requiredText('Section label', 120),
-  section_type: z.enum(['hero', 'rich-text', 'feature-list', 'image-gallery', 'call-to-action', 'cards', 'events', 'hours']),
+  section_type: z.enum(['hero', 'rich-text', 'feature-list', 'image-gallery', 'call-to-action', 'cards', 'events', 'hours', 'announcement']),
   content_json: z.string().trim().min(2, 'Section content JSON is required.').max(30000),
   sort_order: z.coerce.number().int().min(0).max(999),
   published: z.boolean(),
@@ -84,6 +84,28 @@ export const settingsSchema = z.object({
   key: z.string().trim().regex(/^[a-z0-9_]+$/, 'Use lowercase letters, numbers, and underscores only.').max(80),
   label: requiredText('Label', 120),
   value: z.string().trim().max(4000),
+});
+
+export const homeHeroSchema = z.object({
+  eyebrow: requiredText('Hero eyebrow', 120), title: requiredText('Hero title', 160), emphasis: z.string().trim().max(80), body: requiredText('Hero description', 500),
+  primaryLabel: requiredText('Primary button label', 80), primaryHref: z.string().trim().min(1).max(300), secondaryLabel: requiredText('Secondary button label', 80), secondaryHref: z.string().trim().min(1).max(300),
+  imageUrl: requiredText('Hero image URL', 1000), imageAlt: requiredText('Hero image alt text', 250), meta: z.array(requiredText('Hero highlight', 60)).min(1).max(5),
+});
+
+export const homeIntroSchema = z.object({
+  eyebrow: requiredText('Intro eyebrow', 120), titleLines: z.array(requiredText('Intro title line', 80)).min(1).max(4), body: z.array(requiredText('Intro paragraph', 500)).min(1).max(3),
+});
+
+export const homeSectionSchema = z.object({
+  eyebrow: requiredText('Section eyebrow', 120), title: requiredText('Section title', 160), intro: requiredText('Section description', 700),
+});
+
+export const homeCtaSchema = z.object({
+  eyebrow: requiredText('CTA eyebrow', 120), title: requiredText('CTA title', 160), body: z.string().trim().max(700), buttonLabel: requiredText('CTA button label', 80), buttonHref: z.string().trim().min(1).max(300),
+});
+
+export const homeAnnouncementSchema = z.object({
+  enabled: z.boolean(), eyebrow: requiredText('Announcement eyebrow', 120), title: requiredText('Announcement title', 160), body: requiredText('Announcement body', 700), buttonLabel: requiredText('Announcement button label', 80), buttonHref: z.string().trim().min(1).max(300),
 });
 
 export const socialSchema = z.object({

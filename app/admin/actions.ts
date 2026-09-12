@@ -1,10 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
 import { requireAdmin } from '@/lib/auth';
-import type { ActionState } from '@/lib/cms';
+import type { ActionState, Json } from '@/lib/cms';
 import { createSupabaseServerClient } from '@/lib/supabase-server';
-import { cardGameSchema, eventSchema, formBoolean, hourSchema, mediaSchema, nullableFormValue, pageSchema, sectionSchema, settingsSchema, socialSchema } from '@/lib/validation';
+import { cardGameSchema, eventSchema, formBoolean, homeAnnouncementSchema, homeCtaSchema, homeHeroSchema, homeIntroSchema, homeSectionSchema, hourSchema, mediaSchema, nullableFormValue, pageSchema, sectionSchema, settingsSchema, socialSchema } from '@/lib/validation';
 
 const success = (message: string): ActionState => ({ status: 'success', message });
 const failure = (message: string): ActionState => ({ status: 'error', message });
@@ -22,6 +23,64 @@ async function adminClient() {
   return createSupabaseServerClient();
 }
 
+async function saveRevision(supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>, entityType: string, entityId: string, label: string, snapshot: unknown) {
+  const { data: { user } } = await supabase.auth.getUser();
+  await supabase.from('content_revisions').insert({ entity_type: entityType, entity_id: entityId, label, snapshot, created_by: user?.id ?? null });
+}
+
+function parseJsonField(formData: FormData, key: string): Record<string, unknown> | null {
+  try {
+    const value = JSON.parse(String(formData.get(key) || '{}'));
+    return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
+  } catch { return null; }
+}
+
+export async function saveHomepage(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const sections = ['hero', 'intro', 'categories', 'gallery', 'owner', 'visit', 'announcement', 'cta']
+    .map((key) => [key, parseJsonField(formData, key)] as const)
+    .filter((entry): entry is readonly [string, Record<string, unknown>] => Boolean(entry[1]));
+  const hero = homeHeroSchema.safeParse(sections.find(([key]) => key === 'hero')?.[1]);
+  const intro = homeIntroSchema.safeParse(sections.find(([key]) => key === 'intro')?.[1]);
+  const categories = homeSectionSchema.safeParse(sections.find(([key]) => key === 'categories')?.[1]);
+  const gallery = homeSectionSchema.safeParse(sections.find(([key]) => key === 'gallery')?.[1]);
+  const owner = z.object({ eyebrow: z.string().trim().min(1).max(120), title: z.string().trim().min(1).max(160), body: z.array(z.string().trim().min(1).max(500)).min(1).max(3), buttonLabel: z.string().trim().min(1).max(80), buttonHref: z.string().trim().min(1).max(300), imageUrl: z.string().trim().min(1).max(1000), imageAlt: z.string().trim().min(1).max(250) }).safeParse(sections.find(([key]) => key === 'owner')?.[1]);
+  const visit = homeSectionSchema.extend({ socialHeading: z.string().trim().min(1).max(160), socialCopy: z.string().trim().min(1).max(500) }).safeParse(sections.find(([key]) => key === 'visit')?.[1]);
+  const announcement = homeAnnouncementSchema.safeParse(sections.find(([key]) => key === 'announcement')?.[1] ?? { enabled: false, eyebrow: 'Now at the shop', title: 'What is happening this week.', body: 'Announcements and promotions can be published here when there is something worth sharing.', buttonLabel: 'Visit the shop', buttonHref: '/visit.html' });
+  const cta = homeCtaSchema.safeParse(sections.find(([key]) => key === 'cta')?.[1]);
+  const invalid = [hero, intro, categories, gallery, owner, visit, announcement, cta].find((result) => !result.success);
+  if (invalid && !invalid.success) return failure(validationMessage(invalid.error));
+  try {
+    const supabase = await adminClient();
+    const { data: page, error: pageError } = await supabase.from('pages').select('id').eq('slug', 'home').single();
+    if (pageError || !page) return failure('The homepage record could not be found.');
+    const { data: currentSections } = await supabase.from('page_sections').select('*').eq('page_id', page.id);
+    await saveRevision(supabase, 'page_sections', page.id, 'Homepage before save', currentSections ?? []);
+    for (const [key, content] of sections) {
+      const { error } = await supabase.from('page_sections').update({ content }).eq('page_id', page.id).eq('key', key);
+      if (error) return failure(`The homepage ${key} section could not be saved.`);
+    }
+    revalidatePublic();
+    return success('Homepage saved. The public site now uses the updated content, and the previous version is available under Restore history.');
+  } catch { return failure('Authorization failed. Please sign in again.'); }
+}
+
+export async function restoreHomepage(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const revisionId = nullableFormValue(formData, 'revision_id');
+  if (!revisionId) return failure('Choose a revision to restore.');
+  try {
+    const supabase = await adminClient();
+    const { data: revision, error } = await supabase.from('content_revisions').select('*').eq('id', revisionId).single();
+    if (error || !revision || !Array.isArray(revision.snapshot)) return failure('That revision is unavailable.');
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from('content_revisions').insert({ entity_type: 'page_sections', entity_id: revision.entity_id, label: 'Homepage before restore', snapshot: revision.snapshot, created_by: user?.id ?? null });
+    for (const section of revision.snapshot as Array<{ key: string; content: Record<string, Json> }>) {
+      await supabase.from('page_sections').update({ content: section.content }).eq('page_id', revision.entity_id).eq('key', section.key);
+    }
+    revalidatePublic();
+    return success('Homepage restored.');
+  } catch { return failure('Authorization failed.'); }
+}
+
 export async function savePage(_state: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = pageSchema.safeParse({
     id: nullableFormValue(formData, 'id') || undefined,
@@ -32,6 +91,10 @@ export async function savePage(_state: ActionState, formData: FormData): Promise
   try {
     const supabase = await adminClient();
     const { id, ...values } = parsed.data;
+    if (id) {
+      const { data: current } = await supabase.from('pages').select('*').eq('id', id).single();
+      if (current) await saveRevision(supabase, 'pages', id, 'Page before save', current);
+    }
     const query = id ? supabase.from('pages').update(values).eq('id', id) : supabase.from('pages').insert(values);
     const { error } = await query;
     if (error) return failure(error.code === '23505' ? 'A page with that URL slug already exists.' : 'The page could not be saved.');
@@ -65,6 +128,10 @@ export async function saveSection(_state: ActionState, formData: FormData): Prom
     const supabase = await adminClient();
     const { id, content_json: _content, ...values } = parsed.data;
     const payload = { ...values, content };
+    if (id) {
+      const { data: current } = await supabase.from('page_sections').select('*').eq('id', id).single();
+      if (current) await saveRevision(supabase, 'page_sections', id, 'Section before save', current);
+    }
     const query = id ? supabase.from('page_sections').update(payload).eq('id', id) : supabase.from('page_sections').insert(payload);
     const { error } = await query;
     if (error) return failure(error.code === '23505' ? 'This page already has a section with that key.' : 'The section could not be saved.');
@@ -116,7 +183,7 @@ export async function deleteEvent(_state: ActionState, formData: FormData): Prom
 export async function saveSetting(_state: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = settingsSchema.safeParse({ key: formData.get('key'), label: formData.get('label'), value: formData.get('value') });
   if (!parsed.success) return failure(validationMessage(parsed.error));
-  try { const { error } = await (await adminClient()).from('site_settings').upsert(parsed.data, { onConflict: 'key' }); if (error) return failure('The setting could not be saved.'); revalidatePublic(); return success('Site setting saved.'); } catch { return failure('Authorization failed.'); }
+  try { const supabase = await adminClient(); const { data: current } = await supabase.from('site_settings').select('*').eq('key', parsed.data.key).single(); if (current) await saveRevision(supabase, 'site_settings', parsed.data.key, 'Setting before save', current); const { error } = await supabase.from('site_settings').upsert(parsed.data, { onConflict: 'key' }); if (error) return failure('The setting could not be saved.'); revalidatePublic(); return success('Site setting saved.'); } catch { return failure('Authorization failed.'); }
 }
 
 export async function saveSocial(_state: ActionState, formData: FormData): Promise<ActionState> {

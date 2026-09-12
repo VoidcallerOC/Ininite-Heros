@@ -31,16 +31,18 @@ try {
   const target = await openTarget(`${baseUrl}/`);
   const { socket, send } = await connect(target.webSocketDebuggerUrl);
   await send('Page.enable');
-  await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
   const results = [];
-  for (const route of routes) {
-    await send('Page.navigate', { url: `${baseUrl}${route}` }); await delay(1200);
-    results.push(await evaluate(send, `({ path: location.pathname, title: document.title, hasMain: Boolean(document.querySelector('main')), scrollWidth: document.documentElement.scrollWidth, clientWidth: document.documentElement.clientWidth, loginLogoWidth: document.querySelector('.admin-login__logo') ? getComputedStyle(document.querySelector('.admin-login__logo')).width : null, overflow: [...document.querySelectorAll('body *')].filter((element) => element.scrollWidth > document.documentElement.clientWidth).slice(0, 4).map((element) => ({ tag: element.tagName, className: element.className, width: element.scrollWidth })), text: document.body.innerText })`));
+  for (const viewport of [{ name: 'mobile', width: 390, height: 844, mobile: true }, { name: 'tablet', width: 768, height: 1024, mobile: true }, { name: 'desktop', width: 1440, height: 900, mobile: false }]) {
+    await send('Emulation.setDeviceMetricsOverride', { width: viewport.width, height: viewport.height, deviceScaleFactor: 1, mobile: viewport.mobile });
+    for (const route of routes) {
+      await send('Page.navigate', { url: `${baseUrl}${route}` }); await delay(500);
+      results.push(await evaluate(send, `({ viewport: ${JSON.stringify(viewport.name)}, path: location.pathname, title: document.title, hasMain: Boolean(document.querySelector('main')), scrollWidth: document.documentElement.scrollWidth, clientWidth: document.documentElement.clientWidth, loginLogoWidth: document.querySelector('.admin-login__logo') ? getComputedStyle(document.querySelector('.admin-login__logo')).width : null, overflow: [...document.querySelectorAll('body *')].filter((element) => element.scrollWidth > document.documentElement.clientWidth).slice(0, 4).map((element) => ({ tag: element.tagName, className: element.className, width: element.scrollWidth })), text: document.body.innerText })`));
+    }
   }
-  const publicRoutesOk = results.slice(0, 6).every((page) => page.hasMain && page.scrollWidth <= page.clientWidth && (page.text.includes('Content service setup required') || page.text.includes('Infinite Heroes Comics')));
-  const login = results.at(-1);
-  const loginOk = login?.hasMain && login?.text.includes('Admin sign in') && login?.scrollWidth <= login?.clientWidth;
+  const publicRoutesOk = results.filter((page) => page.path !== '/admin/login').every((page) => page.hasMain && page.scrollWidth <= page.clientWidth);
+  const login = results.filter((page) => page.path === '/admin/login');
+  const loginOk = login.every((page) => page.hasMain && page.text.includes('Admin sign in') && page.scrollWidth <= page.clientWidth);
   console.log(JSON.stringify({ baseUrl, publicRoutesOk, loginOk, results: results.map(({ text, ...page }) => page) }, null, 2));
   socket.close(); chrome.kill();
-  if (!publicRoutesOk || !loginOk) process.exit(1);
+  process.exit(publicRoutesOk && loginOk ? 0 : 1);
 } catch (error) { chrome.kill(); console.error(error.stack || error.message); process.exit(1); }

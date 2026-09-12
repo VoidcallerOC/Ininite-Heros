@@ -1,40 +1,34 @@
 import 'server-only';
 
 import type { BusinessHour, CardGame, CmsPageData, MediaAsset, PageSection, PublicSiteData, SocialLink, StoreEvent } from '@/lib/cms';
+import { fallbackPublicSiteData, fallbackPages } from '@/lib/fallback-content';
 import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server';
 
 export async function getPublicSiteData(): Promise<PublicSiteData | null> {
-  if (!isSupabaseConfigured()) return null;
-  const supabase = await createSupabaseServerClient();
-  const [settingsResult, hoursResult, socialsResult] = await Promise.all([
-    supabase.from('site_settings').select('key,value,label,updated_at').order('key'),
-    supabase.from('business_hours').select('*').order('sort_order'),
-    supabase.from('social_links').select('*').eq('active', true).order('sort_order'),
-  ]);
-  if (settingsResult.error || hoursResult.error || socialsResult.error) return null;
-  const settings = Object.fromEntries((settingsResult.data ?? []).map((item) => [item.key, item.value]));
-  return { settings, hours: (hoursResult.data ?? []) as BusinessHour[], socials: (socialsResult.data ?? []) as SocialLink[] };
+  if (!isSupabaseConfigured()) return fallbackPublicSiteData;
+  try {
+    const supabase = await createSupabaseServerClient();
+    const [settingsResult, hoursResult, socialsResult] = await Promise.all([
+      supabase.from('site_settings').select('key,value,label,updated_at').order('key'),
+      supabase.from('business_hours').select('*').order('sort_order'),
+      supabase.from('social_links').select('*').eq('active', true).order('sort_order'),
+    ]);
+    if (settingsResult.error || hoursResult.error || socialsResult.error) return fallbackPublicSiteData;
+    const settings = Object.fromEntries((settingsResult.data ?? []).map((item) => [item.key, item.value]));
+    return { settings, hours: (hoursResult.data ?? []) as BusinessHour[], socials: (socialsResult.data ?? []) as SocialLink[] };
+  } catch { return fallbackPublicSiteData; }
 }
 
 export async function getPublishedPage(slug: string): Promise<CmsPageData | null> {
-  if (!isSupabaseConfigured()) return null;
-  const supabase = await createSupabaseServerClient();
-  const { data: page, error } = await supabase
-    .from('pages')
-    .select('*')
-    .eq('slug', slug)
-    .eq('published', true)
-    .maybeSingle();
-  if (error || !page) return null;
-
-  const { data: sections, error: sectionError } = await supabase
-    .from('page_sections')
-    .select('*')
-    .eq('page_id', page.id)
-    .eq('published', true)
-    .order('sort_order');
-  if (sectionError) return null;
-  return { page, sections: (sections ?? []) as PageSection[] } as CmsPageData;
+  if (!isSupabaseConfigured()) return fallbackPages[slug] ?? null;
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data: page, error } = await supabase.from('pages').select('*').eq('slug', slug).eq('published', true).maybeSingle();
+    if (error || !page) return fallbackPages[slug] ?? null;
+    const { data: sections, error: sectionError } = await supabase.from('page_sections').select('*').eq('page_id', page.id).eq('published', true).order('sort_order');
+    if (sectionError) return fallbackPages[slug] ?? null;
+    return { page, sections: (sections ?? []) as PageSection[] } as CmsPageData;
+  } catch { return fallbackPages[slug] ?? null; }
 }
 
 export async function getActiveCardGames(): Promise<CardGame[]> {
