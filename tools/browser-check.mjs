@@ -31,16 +31,23 @@ try {
   const target = await openTarget(`${baseUrl}/`);
   const { socket, send } = await connect(target.webSocketDebuggerUrl);
   await send('Page.enable');
-  await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
   const results = [];
-  for (const route of routes) {
-    await send('Page.navigate', { url: `${baseUrl}${route}` }); await delay(1200);
-    results.push(await evaluate(send, `({ path: location.pathname, title: document.title, hasMain: Boolean(document.querySelector('main')), scrollWidth: document.documentElement.scrollWidth, clientWidth: document.documentElement.clientWidth, loginLogoWidth: document.querySelector('.admin-login__logo') ? getComputedStyle(document.querySelector('.admin-login__logo')).width : null, overflow: [...document.querySelectorAll('body *')].filter((element) => element.scrollWidth > document.documentElement.clientWidth).slice(0, 4).map((element) => ({ tag: element.tagName, className: element.className, width: element.scrollWidth })), text: document.body.innerText })`));
+  for (const viewport of [{ name: 'mobile', width: 390, height: 844, mobile: true }, { name: 'tablet', width: 768, height: 1024, mobile: true }, { name: 'desktop', width: 1440, height: 900, mobile: false }]) {
+    await send('Emulation.setDeviceMetricsOverride', { width: viewport.width, height: viewport.height, deviceScaleFactor: 1, mobile: viewport.mobile });
+    for (const route of routes) {
+      await send('Page.navigate', { url: `${baseUrl}${route}` }); await delay(500);
+      results.push(await evaluate(send, `({ viewport: ${JSON.stringify(viewport.name)}, path: location.pathname, title: document.title, hasMain: Boolean(document.querySelector('main')), scrollWidth: document.documentElement.scrollWidth, clientWidth: document.documentElement.clientWidth, catalogItems: [...document.querySelectorAll('.catalog-section')].map((element) => element.querySelector('h3')?.textContent?.trim()), catalogNav: [...document.querySelectorAll('.catalog-number-nav a')].map((element) => element.textContent?.trim()), cardGames: [...document.querySelectorAll('.editorial-card h3')].map((element) => element.textContent?.trim()), magicText: document.querySelector('#magic')?.innerText || '', loginLogoWidth: document.querySelector('.admin-login__logo') ? getComputedStyle(document.querySelector('.admin-login__logo')).width : null, overflow: [...document.querySelectorAll('body *')].filter((element) => element.scrollWidth > document.documentElement.clientWidth).slice(0, 4).map((element) => ({ tag: element.tagName, className: element.className, width: element.scrollWidth })), text: document.body.innerText })`));
+    }
   }
-  const publicRoutesOk = results.slice(0, 6).every((page) => page.hasMain && page.scrollWidth <= page.clientWidth && (page.text.includes('Content service setup required') || page.text.includes('Infinite Heroes Comics')));
-  const login = results.at(-1);
-  const loginOk = login?.hasMain && login?.text.includes('Admin sign in') && login?.scrollWidth <= login?.clientWidth;
-  console.log(JSON.stringify({ baseUrl, publicRoutesOk, loginOk, results: results.map(({ text, ...page }) => page) }, null, 2));
+  const publicRoutesOk = results.filter((page) => page.path !== '/admin/login').every((page) => page.hasMain && page.scrollWidth <= page.clientWidth);
+  const comics = results.filter((page) => page.path === '/comics.html');
+  const collectibles = results.filter((page) => page.path === '/collectibles.html');
+  const catalogOk = comics.every((page) => JSON.stringify(page.catalogItems) === JSON.stringify(['NEW COMICS', 'DC & MARVEL', 'GRAPHIC NOVELS AND WALL BOOKS'])) && collectibles.every((page) => JSON.stringify(page.catalogItems) === JSON.stringify(['FIGURES & STATUES', 'FUNKO POP VINYLS', 'WHAT IS ON THE FLOOR']));
+  const cards = results.filter((page) => page.path === '/cards.html');
+  const cardsOk = cards.every((page) => page.cardGames.length === 6 && page.magicText.includes('Every Friday') && page.magicText.includes('7:30 PM') && page.magicText.includes('Friday Night Magic'));
+  const login = results.filter((page) => page.path === '/admin/login');
+  const loginOk = login.every((page) => page.hasMain && page.text.includes('Admin sign in') && page.scrollWidth <= page.clientWidth);
+  console.log(JSON.stringify({ baseUrl, publicRoutesOk, catalogOk, cardsOk, loginOk, results: results.map(({ text, ...page }) => page) }, null, 2));
   socket.close(); chrome.kill();
-  if (!publicRoutesOk || !loginOk) process.exit(1);
+  process.exit(publicRoutesOk && catalogOk && cardsOk && loginOk ? 0 : 1);
 } catch (error) { chrome.kill(); console.error(error.stack || error.message); process.exit(1); }

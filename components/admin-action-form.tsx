@@ -6,12 +6,12 @@ import { initialActionState } from '@/lib/cms';
 
 type ServerAction = (state: ActionState, formData: FormData) => Promise<ActionState>;
 
-export function ActionForm({ action, children, className = 'admin-form' }: Readonly<{ action: ServerAction; children: React.ReactNode; className?: string }>) {
+export function ActionForm({ action, children, className = 'admin-form', submitLabel = 'Save changes' }: Readonly<{ action: ServerAction; children: React.ReactNode; className?: string; submitLabel?: string }>) {
   const [state, formAction, pending] = useActionState(action, initialActionState);
   return <form action={formAction} className={className}>
     {state.status !== 'idle' && <p role="status" className={`admin-notice admin-notice--${state.status}`}>{state.message}</p>}
     {children}
-    <button className="admin-button" type="submit" disabled={pending}>{pending ? 'Saving…' : 'Save changes'}</button>
+    <div className="admin-toolbar"><button className="admin-button admin-button--quiet" type="reset" disabled={pending}>Cancel</button><button className="admin-button" type="submit" disabled={pending}>{pending ? 'Working…' : submitLabel}</button></div>
   </form>;
 }
 

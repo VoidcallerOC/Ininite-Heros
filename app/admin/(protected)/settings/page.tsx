@@ -7,7 +7,8 @@ import type { BusinessHour, SiteSetting, SocialLink } from '@/lib/cms';
 export const dynamic = 'force-dynamic';
 
 function SettingForm({ setting }: { setting: SiteSetting }) {
-  return <ActionForm action={saveSetting}><input type="hidden" name="key" value={setting.key} /><input type="hidden" name="label" value={setting.label} /><div className="admin-field"><label>{setting.label}<input name="value" defaultValue={setting.value} required /></label></div></ActionForm>;
+  const longText = ['business_description', 'footer_summary', 'footer_legal', 'site_description'].includes(setting.key);
+  return <ActionForm action={saveSetting}><input type="hidden" name="key" value={setting.key} /><input type="hidden" name="label" value={setting.label} /><div className="admin-field"><label htmlFor={`setting-${setting.key}`}>{setting.label}</label>{longText ? <textarea id={`setting-${setting.key}`} name="value" defaultValue={setting.value} required maxLength={4000} /> : <input id={`setting-${setting.key}`} name="value" defaultValue={setting.value} required maxLength={4000} />}</div></ActionForm>;
 }
 function SocialForm({ social }: { social?: SocialLink }) {
   return <ActionForm action={saveSocial}><input type="hidden" name="id" value={social?.id || ''} /><div className="admin-form__grid"><div className="admin-field"><label>Platform<input name="platform" defaultValue={social?.platform} required /></label></div><div className="admin-field"><label>Label<input name="label" defaultValue={social?.label} required /></label></div><div className="admin-field"><label>URL<input name="url" type="url" defaultValue={social?.url} required /></label></div><div className="admin-field"><label>Order<input name="sort_order" type="number" min="0" max="999" defaultValue={social?.sort_order ?? 0} required /></label></div></div><label className="admin-checkbox"><input name="active" type="checkbox" defaultChecked={social?.active ?? true} /> Show publicly</label></ActionForm>;

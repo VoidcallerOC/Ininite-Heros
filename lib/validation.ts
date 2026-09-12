@@ -23,17 +23,33 @@ export const sectionSchema = z.object({
   page_id: z.string().uuid(),
   key: z.string().trim().regex(/^[a-z0-9-]+$/, 'Use lowercase letters, numbers, and hyphens only.').max(80),
   label: requiredText('Section label', 120),
-  section_type: z.enum(['hero', 'rich-text', 'feature-list', 'image-gallery', 'call-to-action', 'cards', 'events', 'hours']),
+  section_type: z.enum(['hero', 'rich-text', 'feature-list', 'image-gallery', 'call-to-action', 'cards', 'events', 'hours', 'announcement']),
   content_json: z.string().trim().min(2, 'Section content JSON is required.').max(30000),
   sort_order: z.coerce.number().int().min(0).max(999),
   published: z.boolean(),
+});
+
+export const catalogSectionSchema = z.object({
+  id: z.string().uuid().optional(),
+  catalog_type: z.enum(['comics', 'collectibles']),
+  title: requiredText('Section title', 160),
+  description: requiredText('Section description', 1200),
+  image_url: optionalUrl.optional(),
+  image_alt: z.string().trim().max(250).nullable().optional(),
+  cta_label: requiredText('CTA label', 100),
+  cta_href: z.string().trim().min(1).max(300),
+  sort_order: z.coerce.number().int().min(0).max(999),
+  enabled: z.boolean(),
 });
 
 export const mediaSchema = z.object({
   id: z.string().uuid().optional(),
   name: requiredText('Name', 140),
   alt_text: requiredText('Alt text', 250),
-  url: z.string().url('Provide a valid asset URL.'),
+  url: z.union([z.string().url('Provide a valid asset URL.').refine((value) => /^https?:\/\//i.test(value), 'Use an http(s) URL.'), z.string().regex(/^\/assets\/[a-zA-Z0-9_./-]+$/, 'Use a valid URL or managed /assets/ path.')]),
+  title: z.string().trim().max(180).nullable().optional(),
+  caption: z.string().trim().max(500).nullable().optional(),
+  original_filename: z.string().trim().max(255).nullable().optional(),
   width: z.coerce.number().int().positive().max(20000).nullable().optional(),
   height: z.coerce.number().int().positive().max(20000).nullable().optional(),
   mime_type: requiredText('MIME type', 120),
@@ -46,8 +62,19 @@ export const cardGameSchema = z.object({
   slug: z.string().trim().toLowerCase().regex(/^[a-z0-9-]+$/, 'Use lowercase letters, numbers, and hyphens only.').max(80),
   description: requiredText('Description', 700),
   image_url: optionalUrl.optional(),
+  image_alt: z.string().trim().max(250).nullable().optional(),
+  cta_label: z.string().trim().max(100).nullable().optional(),
+  cta_href: z.string().trim().max(300).nullable().optional(),
   active: z.boolean(),
   sort_order: z.coerce.number().int().min(0).max(999),
+});
+
+export const cardsContentSchema = z.object({
+  id: z.literal('default').optional(),
+  eyebrow: requiredText('Cards eyebrow', 120), title: requiredText('Cards title', 180), description: requiredText('Cards description', 1200),
+  magic_eyebrow: requiredText('Magic eyebrow', 120), magic_title: requiredText('Magic title', 180), magic_description: requiredText('Magic description', 1200),
+  magic_event_wording: requiredText('Magic event wording', 500), magic_event_time: requiredText('Magic event time', 120), magic_event_frequency: requiredText('Magic event frequency', 120), magic_prerelease_text: requiredText('Magic prerelease text', 500),
+  announcement: z.string().trim().max(500).nullable().optional(), featured_game_slug: z.string().trim().max(80).nullable().optional(),
 });
 
 const dateTimeLocal = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, 'Choose a valid local date and time.');
@@ -72,11 +99,19 @@ function newYorkDateTimeToIso(value: string) {
 export const eventSchema = z.object({
   id: z.string().uuid().optional(),
   title: requiredText('Event title', 180),
+  category: requiredText('Category', 120).default('Community event'),
   description: z.string().trim().max(4000).nullable().optional(),
   starts_at: dateTimeLocal.transform(newYorkDateTimeToIso),
   ends_at: dateTimeLocal.transform(newYorkDateTimeToIso).nullable().optional(),
+  location: requiredText('Location', 240).default('Infinite Heroes Comics'),
   image_url: optionalUrl.optional(),
+  image_alt: z.string().trim().max(250).nullable().optional().default(null),
   registration_url: optionalUrl.optional(),
+  recurrence: z.enum(['none', 'weekly']).default('none'),
+  recurrence_day: z.coerce.number().int().min(0).max(6).nullable().optional().default(null),
+  timezone: z.literal('America/New_York').default('America/New_York'),
+  sort_order: z.coerce.number().int().min(0).max(999).default(0),
+  max_occurrences: z.coerce.number().int().min(1).max(520).nullable().optional().default(null),
   published: z.boolean(),
 });
 
@@ -84,6 +119,28 @@ export const settingsSchema = z.object({
   key: z.string().trim().regex(/^[a-z0-9_]+$/, 'Use lowercase letters, numbers, and underscores only.').max(80),
   label: requiredText('Label', 120),
   value: z.string().trim().max(4000),
+});
+
+export const homeHeroSchema = z.object({
+  eyebrow: requiredText('Hero eyebrow', 120), title: requiredText('Hero title', 160), emphasis: z.string().trim().max(80), body: requiredText('Hero description', 500),
+  primaryLabel: requiredText('Primary button label', 80), primaryHref: z.string().trim().min(1).max(300), secondaryLabel: requiredText('Secondary button label', 80), secondaryHref: z.string().trim().min(1).max(300),
+  imageUrl: requiredText('Hero image URL', 1000), imageAlt: requiredText('Hero image alt text', 250), meta: z.array(requiredText('Hero highlight', 60)).min(1).max(5),
+});
+
+export const homeIntroSchema = z.object({
+  eyebrow: requiredText('Intro eyebrow', 120), titleLines: z.array(requiredText('Intro title line', 80)).min(1).max(4), body: z.array(requiredText('Intro paragraph', 500)).min(1).max(3),
+});
+
+export const homeSectionSchema = z.object({
+  eyebrow: requiredText('Section eyebrow', 120), title: requiredText('Section title', 160), intro: requiredText('Section description', 700),
+});
+
+export const homeCtaSchema = z.object({
+  eyebrow: requiredText('CTA eyebrow', 120), title: requiredText('CTA title', 160), body: z.string().trim().max(700), buttonLabel: requiredText('CTA button label', 80), buttonHref: z.string().trim().min(1).max(300),
+});
+
+export const homeAnnouncementSchema = z.object({
+  enabled: z.boolean(), eyebrow: requiredText('Announcement eyebrow', 120), title: requiredText('Announcement title', 160), body: requiredText('Announcement body', 700), buttonLabel: requiredText('Announcement button label', 80), buttonHref: z.string().trim().min(1).max(300),
 });
 
 export const socialSchema = z.object({

@@ -25,11 +25,21 @@ export type PageSection = {
   page_id: string;
   key: string;
   label: string;
-  section_type: string;
+  section_type: 'hero' | 'rich-text' | 'feature-list' | 'image-gallery' | 'call-to-action' | 'cards' | 'events' | 'hours' | 'announcement';
   content: Record<string, Json>;
   sort_order: number;
   published: boolean;
   updated_at: string;
+};
+
+export type ContentRevision = {
+  id: string;
+  entity_type: 'site_settings' | 'pages' | 'page_sections' | 'social_links' | 'business_hours';
+  entity_id: string;
+  label: string;
+  snapshot: Json;
+  created_by: string | null;
+  created_at: string;
 };
 
 export type MediaAsset = {
@@ -41,7 +51,29 @@ export type MediaAsset = {
   height: number | null;
   mime_type: string;
   storage_provider: 'public' | 'vercel_blob';
+  title: string | null;
+  caption: string | null;
+  original_filename: string | null;
+  legacy_urls: string[];
   created_at: string;
+  updated_at: string;
+};
+
+export type CatalogType = 'comics' | 'collectibles';
+
+export type CatalogSection = {
+  id: string;
+  catalog_type: CatalogType;
+  title: string;
+  description: string;
+  image_url: string | null;
+  image_alt: string | null;
+  cta_label: string;
+  cta_href: string;
+  sort_order: number;
+  enabled: boolean;
+  created_at: string;
+  updated_at: string;
 };
 
 export type CardGame = {
@@ -50,18 +82,47 @@ export type CardGame = {
   slug: string;
   description: string;
   image_url: string | null;
+  image_alt: string | null;
+  cta_label: string | null;
+  cta_href: string | null;
   active: boolean;
   sort_order: number;
+  updated_at?: string;
+};
+
+export type CardsContent = {
+  id: 'default';
+  eyebrow: string;
+  title: string;
+  description: string;
+  magic_eyebrow: string;
+  magic_title: string;
+  magic_description: string;
+  magic_event_wording: string;
+  magic_event_time: string;
+  magic_event_frequency: string;
+  magic_prerelease_text: string;
+  announcement: string | null;
+  featured_game_slug: string | null;
+  updated_at?: string;
 };
 
 export type StoreEvent = {
   id: string;
   title: string;
+  category: string;
   description: string | null;
   starts_at: string;
   ends_at: string | null;
+  location: string;
   image_url: string | null;
+  image_alt: string | null;
   registration_url: string | null;
+  recurrence: 'none' | 'weekly';
+  recurrence_day: number | null;
+  timezone: string;
+  sort_order: number;
+  max_occurrences: number | null;
   published: boolean;
   created_at: string;
 };
