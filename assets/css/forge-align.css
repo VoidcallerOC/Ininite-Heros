@@ -2,7 +2,7 @@
 
 /* FORGE CT family.
    Shared: ink floor #070708, DM Sans + DM Mono, status pill, pill CTAs, numbered eyebrows.
-   Unique to Infinite Heroes: gold #e8c94c wordmark accent. Not Sunny pink. Not Hard Hittin red. */
+   Unique to Infinite Heroes: gold #2b9a70 wordmark accent. Not Sunny pink. Not Hard Hittin red. */
 
 :root {
   --ink: #070708;
@@ -12,8 +12,8 @@
   --white: #f3efe6;
   --ink-soft: #b7b4ae;
   --slate: #8f8c86;
-  --yellow: #e8c94c;
-  --yellow-soft: #c9ab3a;
+  --yellow: #2b9a70;
+  --yellow-soft: #237f5c;
   --coral: #e5674d;
   --blue: #5270e6;
   --blue-deep: #3046c2;
@@ -53,7 +53,7 @@ body {
 }
 
 .nav-cta:hover {
-  background: #f3d76a;
+  background: #3fb98b;
   transform: none;
   box-shadow: none;
 }
@@ -92,7 +92,7 @@ body {
 
 .hero {
   background:
-    radial-gradient(ellipse at top left, rgba(232, 201, 76, .14), transparent 48%),
+    radial-gradient(ellipse at top left, rgba(43, 154, 112, .14), transparent 48%),
     #070708;
   border-bottom: 1px solid rgba(243, 239, 230, .08);
 }
@@ -155,7 +155,7 @@ body {
 }
 
 .eyebrow {
-  color: #c9ab3a;
+  color: #237f5c;
   letter-spacing: .16em;
   text-transform: uppercase;
   font-size: .72rem;
@@ -216,7 +216,7 @@ body {
 .category-card__number {
   font-family: "DM Mono", ui-monospace, monospace;
   letter-spacing: .1em;
-  color: #8a5a12;
+  color: #165c45;
 }
 
 .category-card__title,
@@ -266,7 +266,7 @@ body {
 .visit-shop-card--social {
   background: #1a120f;
   color: #f3efe6;
-  border: 1px solid rgba(232, 201, 76, .24);
+  border: 1px solid rgba(43, 154, 112, .24);
 }
 
 .visit-shop-card--social h3,
