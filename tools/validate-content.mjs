@@ -2,67 +2,29 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = process.cwd();
-const pages = ['index.html', 'comics.html', 'collectibles.html', 'about.html', 'visit.html'];
+const migrationPath = join(root, 'supabase/migrations/20260912103000_cms_foundation.sql');
+if (!existsSync(migrationPath)) throw new Error('CMS migration not found.');
+const migration = readFileSync(migrationPath, 'utf8');
 const errors = [];
-const imagePattern = /<img\b[^>]*>/gi;
-const attribute = (tag, name) => tag.match(new RegExp(`\\b${name}=["']([^"']*)["']`, 'i'))?.[1] ?? null;
 
-for (const page of pages) {
-  const path = join(root, page);
-  const html = readFileSync(path, 'utf8');
+for (const content of [
+  'Infinite Heroes Comics', '1098 Main St', 'Watertown, CT 06795', '860-417-2559', 'paul@infiniteheroes.net',
+  'Every shelf is a new world.', 'Paul Santos', 'From DC to Main Street.', 'Find your next pull.',
+  'https://www.facebook.com/infiniteheroescomics/', 'https://www.instagram.com/infiniteheroescomics/',
+]) if (!migration.includes(content)) errors.push(`Seed migration missing expected public content: ${content}`);
 
-  for (const [label, pattern] of [
-    ['meta description', /<meta\s+name=["']description["']\s+content=["'][^"']{20,}["']/i],
-    ['canonical URL', /<link\s+rel=["']canonical["']\s+href=["']https:\/\/infiniteheroes\.net\//i],
-    ['Open Graph title', /<meta\s+property=["']og:title["']\s+content=["'][^"']+["']/i],
-    ['Open Graph description', /<meta\s+property=["']og:description["']\s+content=["'][^"']+["']/i],
-    ['Twitter card', /<meta\s+name=["']twitter:card["']\s+content=["']summary_large_image["']/i],
-    ['linked supplied logo', /<a\s+class=["']brand["']\s+href=["']index\.html["'][^>]*>\s*<img[^>]+src=["']assets\/images\/infinite-heroes-logo\.webp["']/i],
-  ]) {
-    if (!pattern.test(html)) errors.push(`${page}: missing or invalid ${label}`);
-  }
-
-  const images = html.match(imagePattern) || [];
-  if (!images.length) errors.push(`${page}: no image elements found`);
-  images.forEach((tag, index) => {
-    const src = attribute(tag, 'src');
-    const alt = attribute(tag, 'alt');
-    if (!src) errors.push(`${page}: image ${index + 1} has no src`);
-    if (alt === null) errors.push(`${page}: image ${index + 1} has no alt text`);
-    if (!attribute(tag, 'width') || !attribute(tag, 'height')) errors.push(`${page}: image ${index + 1} is missing intrinsic dimensions`);
-    if (src && !existsSync(join(root, src))) errors.push(`${page}: image ${index + 1} has a missing local file (${src})`);
-  });
-
-  if (/hero-art|category-card__graphic|owner-portrait|story-panel__art|page-hero__ornament|map-link|brand__mark|brand__name/i.test(html)) {
-    errors.push(`${page}: contains obsolete CSS-placeholder markup`);
-  }
+for (const slug of ['home', 'comics', 'cards', 'collectibles', 'about', 'visit']) {
+  if (!migration.includes(`('${slug}',`)) errors.push(`Seed migration missing ${slug} page record.`);
 }
-
-const home = readFileSync(join(root, 'index.html'), 'utf8');
-const schemaBlock = home.match(/<script\s+type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/i)?.[1];
-try {
-  const schema = JSON.parse(schemaBlock || '');
-  if (schema['@type'] !== 'Store' || schema.name !== 'Infinite Heroes Comics') errors.push('index.html: invalid Store structured data');
-} catch {
-  errors.push('index.html: invalid JSON-LD structured data');
+for (const asset of ['infinite-heroes-logo.webp', 'new-comics.webp', 'trading-cards.webp', 'collectibles-and-statues.webp', 'shop-detail-1.webp']) {
+  if (!existsSync(join(root, 'public/assets/images', asset))) errors.push(`Seed-referenced media file is missing: public/assets/images/${asset}`);
 }
-
-const visit = readFileSync(join(root, 'visit.html'), 'utf8');
-for (const [label, value] of [
-  ['address', '1098 Main St'],
-  ['phone link', 'tel:+18604172559'],
-  ['email link', 'mailto:paul@infiniteheroes.net'],
-  ['maps directions', 'https://maps.google.com/?q=1098+Main+St,+Watertown,+CT+06795'],
-  ['Facebook link', 'https://www.facebook.com/infiniteheroescomics/'],
-  ['Instagram link', 'https://www.instagram.com/infiniteheroescomics/'],
-]) {
-  if (!visit.includes(value)) errors.push(`visit.html: missing ${label}`);
-}
+if (!migration.includes("('cards', 'Cards'")) errors.push('Managed Cards page seed is absent.');
+if (/<script|javascript:/i.test(migration)) errors.push('Seed content must not contain executable script URLs or script markup.');
 
 if (errors.length) {
-  console.error('\nContent and SEO validation failed:\n');
+  console.error('\nCMS content seed validation failed:\n');
   errors.forEach((error) => console.error(`  ✗ ${error}`));
   process.exit(1);
 }
-
-console.log(`Content and SEO validation passed for ${pages.length} pages, ${pages.map((page) => (readFileSync(join(root, page), 'utf8').match(imagePattern) || []).length).reduce((total, count) => total + count, 0)} images, local brand assets, metadata, JSON-LD, and visit links.`);
+console.log('CMS content seed validation passed: existing business information, photography assets, branded copy, social links, and all six managed pages are present.');
