@@ -11,6 +11,7 @@ const uploadDir = path.join(root, 'uploads');
 const contentFile = path.join(dataDir, 'content.json');
 const sessionSecret = process.env.ADMIN_SESSION_SECRET || 'change-this-session-secret';
 const adminPassword = process.env.ADMIN_PASSWORD || 'infinite-heroes-admin';
+const adminEnabled = process.env.ADMIN_ENABLED === 'true';
 const sessions = new Map();
 fs.mkdirSync(dataDir, { recursive: true });
 fs.mkdirSync(uploadDir, { recursive: true });
@@ -45,6 +46,7 @@ function body(req) { return new Promise((resolve, reject) => { let b = ''; req.o
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   try {
+    if ((url.pathname === '/admin.html' || url.pathname.startsWith('/api/admin/')) && !adminEnabled) return json(res, 404, { error: 'Not found' });
     if (url.pathname === '/api/content' && req.method === 'GET') return json(res, 200, readData());
     if (url.pathname === '/api/admin/login' && req.method === 'POST') { const b = await body(req); if (b.password !== adminPassword) return json(res, 401, { error: 'Invalid password' }); const token = crypto.randomBytes(24).toString('hex'); sessions.set(token, Date.now()); res.setHeader('Set-Cookie', cookie('ih_admin', token)); return json(res, 200, { ok: true }); }
     if (url.pathname === '/api/admin/logout' && req.method === 'POST') { res.setHeader('Set-Cookie', cookie('ih_admin', '', 0)); return json(res, 200, { ok: true }); }
