@@ -7,7 +7,7 @@ import { requireAdmin } from '@/lib/auth';
 import type { ActionState, Json, MediaAsset } from '@/lib/cms';
 import { createSupabaseServerClient } from '@/lib/supabase-server';
 import { getMediaUsage } from '@/lib/media-usage';
-import { cardGameSchema, eventSchema, formBoolean, homeAnnouncementSchema, homeCtaSchema, homeHeroSchema, homeIntroSchema, homeSectionSchema, hourSchema, mediaSchema, nullableFormValue, pageSchema, sectionSchema, settingsSchema, socialSchema } from '@/lib/validation';
+import { cardGameSchema, catalogSectionSchema, eventSchema, formBoolean, homeAnnouncementSchema, homeCtaSchema, homeHeroSchema, homeIntroSchema, homeSectionSchema, hourSchema, mediaSchema, nullableFormValue, pageSchema, sectionSchema, settingsSchema, socialSchema } from '@/lib/validation';
 
 const success = (message: string): ActionState => ({ status: 'success', message });
 const failure = (message: string): ActionState => ({ status: 'error', message });
@@ -157,6 +157,18 @@ export async function saveMedia(_state: ActionState, formData: FormData): Promis
 export async function deleteMedia(_state: ActionState, formData: FormData): Promise<ActionState> {
   const id = nullableFormValue(formData, 'id'); if (!id) return failure('Missing media ID.');
   try { const supabase = await adminClient(); const { data: asset } = await supabase.from('media').select('*').eq('id', id).single(); if (!asset) return failure('The media record could not be found.'); const usage = await getMediaUsage([asset as MediaAsset]); if (usage[id]?.count) return failure(`This image is still used by ${usage[id].locations.slice(0, 3).join(', ')}. Replace or remove those references before deleting it.`); const { error } = await supabase.from('media').delete().eq('id', id); if (error) return failure('The media record could not be deleted.'); if (asset.storage_provider === 'vercel_blob' && process.env.BLOB_READ_WRITE_TOKEN) { await del(asset.url).catch(() => undefined); for (const legacyUrl of asset.legacy_urls || []) await del(legacyUrl).catch(() => undefined); } revalidatePublic(); return success('Media record deleted.'); } catch { return failure('Authorization failed.'); }
+}
+
+export async function saveCatalogSection(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const parsed = catalogSectionSchema.safeParse({ id: nullableFormValue(formData, 'id') || undefined, catalog_type: formData.get('catalog_type'), title: formData.get('title'), description: formData.get('description'), image_url: nullableFormValue(formData, 'image_url'), image_alt: nullableFormValue(formData, 'image_alt'), cta_label: formData.get('cta_label'), cta_href: formData.get('cta_href'), sort_order: formData.get('sort_order'), enabled: formBoolean(formData, 'enabled') });
+  if (!parsed.success) return failure(validationMessage(parsed.error));
+  if (parsed.data.image_url && !parsed.data.image_alt) return failure('Image alt text is required when a section has an image.');
+  try { const supabase = await adminClient(); const { id, ...values } = parsed.data; const { error } = await (id ? supabase.from('catalog_sections').update(values).eq('id', id) : supabase.from('catalog_sections').insert(values)); if (error) return failure('The catalog section could not be saved.'); revalidatePublic(); return success('Catalog section saved and public content revalidated.'); } catch { return failure('Authorization failed.'); }
+}
+
+export async function deleteCatalogSection(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const id = nullableFormValue(formData, 'id'); if (!id) return failure('Missing catalog section ID.');
+  try { const { error } = await (await adminClient()).from('catalog_sections').delete().eq('id', id); if (error) return failure('The catalog section could not be deleted.'); revalidatePublic(); return success('Catalog section deleted.'); } catch { return failure('Authorization failed.'); }
 }
 
 export async function saveCardGame(_state: ActionState, formData: FormData): Promise<ActionState> {

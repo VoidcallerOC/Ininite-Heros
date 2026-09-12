@@ -36,13 +36,16 @@ try {
     await send('Emulation.setDeviceMetricsOverride', { width: viewport.width, height: viewport.height, deviceScaleFactor: 1, mobile: viewport.mobile });
     for (const route of routes) {
       await send('Page.navigate', { url: `${baseUrl}${route}` }); await delay(500);
-      results.push(await evaluate(send, `({ viewport: ${JSON.stringify(viewport.name)}, path: location.pathname, title: document.title, hasMain: Boolean(document.querySelector('main')), scrollWidth: document.documentElement.scrollWidth, clientWidth: document.documentElement.clientWidth, loginLogoWidth: document.querySelector('.admin-login__logo') ? getComputedStyle(document.querySelector('.admin-login__logo')).width : null, overflow: [...document.querySelectorAll('body *')].filter((element) => element.scrollWidth > document.documentElement.clientWidth).slice(0, 4).map((element) => ({ tag: element.tagName, className: element.className, width: element.scrollWidth })), text: document.body.innerText })`));
+      results.push(await evaluate(send, `({ viewport: ${JSON.stringify(viewport.name)}, path: location.pathname, title: document.title, hasMain: Boolean(document.querySelector('main')), scrollWidth: document.documentElement.scrollWidth, clientWidth: document.documentElement.clientWidth, catalogItems: [...document.querySelectorAll('.catalog-section')].map((element) => element.querySelector('h3')?.textContent?.trim()), catalogNav: [...document.querySelectorAll('.catalog-number-nav a')].map((element) => element.textContent?.trim()), loginLogoWidth: document.querySelector('.admin-login__logo') ? getComputedStyle(document.querySelector('.admin-login__logo')).width : null, overflow: [...document.querySelectorAll('body *')].filter((element) => element.scrollWidth > document.documentElement.clientWidth).slice(0, 4).map((element) => ({ tag: element.tagName, className: element.className, width: element.scrollWidth })), text: document.body.innerText })`));
     }
   }
   const publicRoutesOk = results.filter((page) => page.path !== '/admin/login').every((page) => page.hasMain && page.scrollWidth <= page.clientWidth);
+  const comics = results.filter((page) => page.path === '/comics.html');
+  const collectibles = results.filter((page) => page.path === '/collectibles.html');
+  const catalogOk = comics.every((page) => JSON.stringify(page.catalogItems) === JSON.stringify(['NEW COMICS', 'DC & MARVEL', 'GRAPHIC NOVELS AND WALL BOOKS'])) && collectibles.every((page) => JSON.stringify(page.catalogItems) === JSON.stringify(['FIGURES & STATUES', 'FUNKO POP VINYLS', 'WHAT IS ON THE FLOOR']));
   const login = results.filter((page) => page.path === '/admin/login');
   const loginOk = login.every((page) => page.hasMain && page.text.includes('Admin sign in') && page.scrollWidth <= page.clientWidth);
-  console.log(JSON.stringify({ baseUrl, publicRoutesOk, loginOk, results: results.map(({ text, ...page }) => page) }, null, 2));
+  console.log(JSON.stringify({ baseUrl, publicRoutesOk, catalogOk, loginOk, results: results.map(({ text, ...page }) => page) }, null, 2));
   socket.close(); chrome.kill();
-  process.exit(publicRoutesOk && loginOk ? 0 : 1);
+  process.exit(publicRoutesOk && catalogOk && loginOk ? 0 : 1);
 } catch (error) { chrome.kill(); console.error(error.stack || error.message); process.exit(1); }

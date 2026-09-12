@@ -5,7 +5,7 @@ import { isSupabaseConfigured } from '@/lib/supabase-server';
 import { signOut } from '@/app/admin/actions';
 
 const navigation = [
-  ['/', 'Dashboard'], ['/homepage', 'Homepage'], ['/pages', 'Pages'], ['/sections', 'Sections'], ['/media', 'Media'], ['/cards', 'Cards'], ['/events', 'Events'], ['/settings', 'Site Settings'], ['/analytics', 'Analytics'],
+  ['/','Dashboard'], ['/homepage', 'Homepage'], ['/pages', 'Pages'], ['/sections', 'Sections'], ['/catalog', 'Comics & Collectibles'], ['/media', 'Media'], ['/cards', 'Cards'], ['/events', 'Events'], ['/settings', 'Site Settings'], ['/analytics', 'Analytics'],
 ];
 
 export default async function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {

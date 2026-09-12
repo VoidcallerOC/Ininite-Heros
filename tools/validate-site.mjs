@@ -7,8 +7,8 @@ const requiredFiles = [
   'app/layout.tsx', 'app/page.tsx', 'app/admin/(protected)/layout.tsx', 'app/admin/login/page.tsx',
   'app/admin/actions.ts', 'app/api/analytics/route.ts', 'app/api/admin/media/upload/route.ts',
   'lib/auth.ts', 'lib/authorization.ts', 'lib/public-data.ts', 'proxy.ts',
-  'supabase/migrations/20260912103000_cms_foundation.sql', 'supabase/migrations/20260912110000_global_content_management.sql', 'supabase/migrations/20260912120000_media_management.sql', '.env.example', 'vercel.json',
-  'app/admin/(protected)/homepage/page.tsx', 'components/homepage-editor.tsx', 'lib/fallback-content.ts', 'lib/media-usage.ts', 'components/media-upload.tsx',
+  'supabase/migrations/20260912103000_cms_foundation.sql', 'supabase/migrations/20260912110000_global_content_management.sql', 'supabase/migrations/20260912120000_media_management.sql', 'supabase/migrations/20260912130000_catalog_sections.sql', '.env.example', 'vercel.json',
+  'app/admin/(protected)/homepage/page.tsx', 'app/admin/(protected)/catalog/page.tsx', 'components/homepage-editor.tsx', 'lib/fallback-content.ts', 'lib/media-usage.ts', 'components/media-upload.tsx',
 ];
 for (const file of requiredFiles) if (!existsSync(join(root, file))) errors.push(`Missing required CMS file: ${file}`);
 
@@ -18,6 +18,8 @@ if (!phase2Migration.includes('create table public.content_revisions')) errors.p
 if (!phase2Migration.includes("'business_description'")) errors.push('Phase 2 migration missing editable business description seed.');
 const mediaMigration = existsSync(join(root, 'supabase/migrations/20260912120000_media_management.sql')) ? readFileSync(join(root, 'supabase/migrations/20260912120000_media_management.sql'), 'utf8') : '';
 for (const field of ['title', 'caption', 'original_filename', 'legacy_urls']) if (!mediaMigration.includes(`add column if not exists ${field}`)) errors.push(`Media migration missing metadata field: ${field}`);
+const catalogMigration = existsSync(join(root, 'supabase/migrations/20260912130000_catalog_sections.sql')) ? readFileSync(join(root, 'supabase/migrations/20260912130000_catalog_sections.sql'), 'utf8') : '';
+for (const marker of ['create table public.catalog_sections', "catalog_type in ('comics', 'collectibles')", 'public can read enabled catalog sections', "'NEW COMICS'", "'FIGURES & STATUES'"]) if (!catalogMigration.includes(marker)) errors.push(`Catalog migration missing: ${marker}`);
 for (const table of ['profiles', 'site_settings', 'pages', 'page_sections', 'media', 'card_games', 'events', 'social_links', 'business_hours', 'analytics_events']) {
   if (!new RegExp(`create table public\\.${table}`, 'i').test(migration)) errors.push(`Database migration missing table: ${table}`);
   if (!new RegExp(`alter table public\\.${table} enable row level security`, 'i').test(migration)) errors.push(`Database migration missing RLS enablement: ${table}`);

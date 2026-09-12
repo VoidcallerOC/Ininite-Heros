@@ -1,7 +1,7 @@
 import 'server-only';
 
-import type { BusinessHour, CardGame, CmsPageData, MediaAsset, PageSection, PublicSiteData, SocialLink, StoreEvent } from '@/lib/cms';
-import { fallbackPublicSiteData, fallbackPages } from '@/lib/fallback-content';
+import type { BusinessHour, CardGame, CatalogSection, CatalogType, CmsPageData, MediaAsset, PageSection, PublicSiteData, SocialLink, StoreEvent } from '@/lib/cms';
+import { fallbackPublicSiteData, fallbackPages, fallbackCatalogSections } from '@/lib/fallback-content';
 import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server';
 
 function resolveMediaValue(value: unknown, mediaById: Map<string, string>, mediaByUrl: Map<string, string>): unknown {
@@ -53,6 +53,18 @@ export async function getActiveCardGames(): Promise<CardGame[]> {
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase.from('card_games').select('*').eq('active', true).order('sort_order');
   return (data ?? []) as CardGame[];
+}
+
+export async function getCatalogSections(catalogType: CatalogType): Promise<CatalogSection[]> {
+  if (!isSupabaseConfigured()) return fallbackCatalogSections[catalogType];
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.from('catalog_sections').select('*').eq('catalog_type', catalogType).eq('enabled', true).order('sort_order').order('created_at');
+    if (error || !data?.length) return fallbackCatalogSections[catalogType];
+    const media = await supabase.from('media').select('id,url');
+    const mediaById = new Map((media.data ?? []).map((asset) => [asset.id, asset.url]));
+    return (data as CatalogSection[]).map((section) => ({ ...section, image_url: section.image_url?.startsWith('media://') ? mediaById.get(section.image_url.slice('media://'.length)) || null : section.image_url }));
+  } catch { return fallbackCatalogSections[catalogType]; }
 }
 
 export async function getPublishedEvents(): Promise<StoreEvent[]> {

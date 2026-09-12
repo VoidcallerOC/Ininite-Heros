@@ -59,6 +59,23 @@ export type MediaAsset = {
   updated_at: string;
 };
 
+export type CatalogType = 'comics' | 'collectibles';
+
+export type CatalogSection = {
+  id: string;
+  catalog_type: CatalogType;
+  title: string;
+  description: string;
+  image_url: string | null;
+  image_alt: string | null;
+  cta_label: string;
+  cta_href: string;
+  sort_order: number;
+  enabled: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
 export type CardGame = {
   id: string;
   name: string;

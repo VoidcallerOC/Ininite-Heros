@@ -29,6 +29,19 @@ export const sectionSchema = z.object({
   published: z.boolean(),
 });
 
+export const catalogSectionSchema = z.object({
+  id: z.string().uuid().optional(),
+  catalog_type: z.enum(['comics', 'collectibles']),
+  title: requiredText('Section title', 160),
+  description: requiredText('Section description', 1200),
+  image_url: optionalUrl.optional(),
+  image_alt: z.string().trim().max(250).nullable().optional(),
+  cta_label: requiredText('CTA label', 100),
+  cta_href: z.string().trim().min(1).max(300),
+  sort_order: z.coerce.number().int().min(0).max(999),
+  enabled: z.boolean(),
+});
+
 export const mediaSchema = z.object({
   id: z.string().uuid().optional(),
   name: requiredText('Name', 140),
