@@ -15,8 +15,8 @@
   --yellow: #2b9a70;
   --yellow-soft: #237f5c;
   --coral: #e5674d;
-  --blue: #5270e6;
-  --blue-deep: #3046c2;
+  --blue: #8ed1b5;
+  --blue-deep: #165c45;
 }
 
 body {
@@ -323,4 +323,25 @@ body {
   .owner-photo img {
     aspect-ratio: 16 / 10;
   }
+}
+
+/* Category cards: keep the accent labels inside the paper panel and align their type with the title. */
+.category-card__body {
+  padding: 1.25rem 1.35rem 1.5rem;
+}
+
+.category-card__number,
+.category-card__link {
+  font-family: "DM Sans", Manrope, Arial, sans-serif;
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.category-card__number {
+  color: #2b9a70;
+}
+
+.category-card__link {
+  color: #2b9a70;
 }
