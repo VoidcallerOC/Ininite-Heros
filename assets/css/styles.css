@@ -401,3 +401,6 @@ body { background: var(--paper); }
 .stacked-words span:nth-child(2), .category-card__link, .eyebrow { color: var(--blue); }
 .eyebrow--light, .page-hero--ink .eyebrow { color: var(--blue); }
 .feature-list__number, .category-card__number { color: var(--yellow); }
+.hero .display em, .stacked-words span:nth-child(2), .stacked-words span:nth-child(3), .page-hero .display em { color: #2b9a70 !important; }
+.button--primary, .nav-cta { background: #2b9a70 !important; color: #070a08 !important; border-color: #2b9a70 !important; box-shadow: 4px 4px 0 #070a08 !important; }
+.hero__photo, .page-hero__visual { box-shadow: 10px 10px 0 #2b9a70 !important; }
