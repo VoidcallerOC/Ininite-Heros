@@ -1,10 +1,12 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { del } from '@vercel/blob';
 import { z } from 'zod';
 import { requireAdmin } from '@/lib/auth';
-import type { ActionState, Json } from '@/lib/cms';
+import type { ActionState, Json, MediaAsset } from '@/lib/cms';
 import { createSupabaseServerClient } from '@/lib/supabase-server';
+import { getMediaUsage } from '@/lib/media-usage';
 import { cardGameSchema, eventSchema, formBoolean, homeAnnouncementSchema, homeCtaSchema, homeHeroSchema, homeIntroSchema, homeSectionSchema, hourSchema, mediaSchema, nullableFormValue, pageSchema, sectionSchema, settingsSchema, socialSchema } from '@/lib/validation';
 
 const success = (message: string): ActionState => ({ status: 'success', message });
@@ -147,14 +149,14 @@ export async function deleteSection(_state: ActionState, formData: FormData): Pr
 }
 
 export async function saveMedia(_state: ActionState, formData: FormData): Promise<ActionState> {
-  const parsed = mediaSchema.safeParse({ id: nullableFormValue(formData, 'id') || undefined, name: formData.get('name'), alt_text: formData.get('alt_text'), url: formData.get('url'), width: nullableFormValue(formData, 'width') ? formData.get('width') : null, height: nullableFormValue(formData, 'height') ? formData.get('height') : null, mime_type: formData.get('mime_type'), storage_provider: formData.get('storage_provider') });
+  const parsed = mediaSchema.safeParse({ id: nullableFormValue(formData, 'id') || undefined, name: formData.get('name'), alt_text: formData.get('alt_text'), title: nullableFormValue(formData, 'title'), caption: nullableFormValue(formData, 'caption'), original_filename: nullableFormValue(formData, 'original_filename'), url: formData.get('url'), width: nullableFormValue(formData, 'width') ? formData.get('width') : null, height: nullableFormValue(formData, 'height') ? formData.get('height') : null, mime_type: formData.get('mime_type'), storage_provider: formData.get('storage_provider') });
   if (!parsed.success) return failure(validationMessage(parsed.error));
   try { const supabase = await adminClient(); const { id, ...values } = parsed.data; const { error } = await (id ? supabase.from('media').update(values).eq('id', id) : supabase.from('media').insert(values)); if (error) return failure('The media record could not be saved.'); revalidatePublic(); return success('Media record saved.'); } catch { return failure('Authorization failed.'); }
 }
 
 export async function deleteMedia(_state: ActionState, formData: FormData): Promise<ActionState> {
   const id = nullableFormValue(formData, 'id'); if (!id) return failure('Missing media ID.');
-  try { const { error } = await (await adminClient()).from('media').delete().eq('id', id); if (error) return failure('The media record could not be deleted.'); revalidatePublic(); return success('Media record deleted.'); } catch { return failure('Authorization failed.'); }
+  try { const supabase = await adminClient(); const { data: asset } = await supabase.from('media').select('*').eq('id', id).single(); if (!asset) return failure('The media record could not be found.'); const usage = await getMediaUsage([asset as MediaAsset]); if (usage[id]?.count) return failure(`This image is still used by ${usage[id].locations.slice(0, 3).join(', ')}. Replace or remove those references before deleting it.`); const { error } = await supabase.from('media').delete().eq('id', id); if (error) return failure('The media record could not be deleted.'); if (asset.storage_provider === 'vercel_blob' && process.env.BLOB_READ_WRITE_TOKEN) { await del(asset.url).catch(() => undefined); for (const legacyUrl of asset.legacy_urls || []) await del(legacyUrl).catch(() => undefined); } revalidatePublic(); return success('Media record deleted.'); } catch { return failure('Authorization failed.'); }
 }
 
 export async function saveCardGame(_state: ActionState, formData: FormData): Promise<ActionState> {

@@ -51,7 +51,12 @@ export type MediaAsset = {
   height: number | null;
   mime_type: string;
   storage_provider: 'public' | 'vercel_blob';
+  title: string | null;
+  caption: string | null;
+  original_filename: string | null;
+  legacy_urls: string[];
   created_at: string;
+  updated_at: string;
 };
 
 export type CardGame = {

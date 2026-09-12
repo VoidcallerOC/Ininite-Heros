@@ -4,6 +4,16 @@ import type { BusinessHour, CardGame, CmsPageData, MediaAsset, PageSection, Publ
 import { fallbackPublicSiteData, fallbackPages } from '@/lib/fallback-content';
 import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server';
 
+function resolveMediaValue(value: unknown, mediaById: Map<string, string>, mediaByUrl: Map<string, string>): unknown {
+  if (typeof value === 'string') {
+    if (value.startsWith('media://')) return mediaById.get(value.slice('media://'.length)) || value;
+    return mediaByUrl.get(value) || value;
+  }
+  if (Array.isArray(value)) return value.map((item) => resolveMediaValue(item, mediaById, mediaByUrl));
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, resolveMediaValue(item, mediaById, mediaByUrl)]));
+  return value;
+}
+
 export async function getPublicSiteData(): Promise<PublicSiteData | null> {
   if (!isSupabaseConfigured()) return fallbackPublicSiteData;
   try {
@@ -25,9 +35,16 @@ export async function getPublishedPage(slug: string): Promise<CmsPageData | null
     const supabase = await createSupabaseServerClient();
     const { data: page, error } = await supabase.from('pages').select('*').eq('slug', slug).eq('published', true).maybeSingle();
     if (error || !page) return fallbackPages[slug] ?? null;
-    const { data: sections, error: sectionError } = await supabase.from('page_sections').select('*').eq('page_id', page.id).eq('published', true).order('sort_order');
+    const [{ data: sections, error: sectionError }, { data: media }] = await Promise.all([
+      supabase.from('page_sections').select('*').eq('page_id', page.id).eq('published', true).order('sort_order'),
+      supabase.from('media').select('id,url'),
+    ]);
     if (sectionError) return fallbackPages[slug] ?? null;
-    return { page, sections: (sections ?? []) as PageSection[] } as CmsPageData;
+    const mediaById = new Map((media ?? []).map((asset) => [asset.id, asset.url]));
+    const mediaByUrl = new Map((media ?? []).map((asset) => [asset.url, asset.url]));
+    const resolvedSections = (sections ?? []).map((section) => ({ ...section, content: resolveMediaValue(section.content, mediaById, mediaByUrl) }));
+    const resolvedPage = { ...page, og_image_url: page.og_image_url ? String(resolveMediaValue(page.og_image_url, mediaById, mediaByUrl)) : page.og_image_url };
+    return { page: resolvedPage, sections: resolvedSections as PageSection[] } as CmsPageData;
   } catch { return fallbackPages[slug] ?? null; }
 }
 
