@@ -22,7 +22,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { overflow-x: clip; scroll-behavior: smooth; }
 body { margin: 0; color: var(--white); background: var(--paper); font-family: Manrope, Arial, sans-serif; font-size: 16px; line-height: 1.6; }
 body.menu-open { overflow: hidden; }
 body::selection { background: var(--yellow); color: var(--ink); }
@@ -324,7 +324,7 @@ button, input { font: inherit; }
 .hero__photo figcaption { border-width: 1px; box-shadow: 5px 5px 0 var(--ink); }
 .category-section { background: var(--paper); border-block: 0; }
 .category-section::before { width: 48%; opacity: .7; }
-.category-grid { grid-template-columns: 1.08fr .92fr 1.02fr; align-items: start; gap: clamp(1.5rem, 3vw, 3rem); }
+.category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: clamp(1.5rem, 3vw, 3rem); }
 .category-card { display: block; overflow: visible; border: 0; background: transparent; box-shadow: none; }
 .category-card:nth-child(2) { margin-top: 4rem; }
 .category-card:nth-child(3) { margin-top: 1.5rem; }
@@ -409,13 +409,13 @@ body { background: var(--paper); }
 .category-grid > *, .inside-gallery > *, .photo-feature-grid > *, .editorial-card-grid > *, .visit-shop-grid > *, .hero__grid > *, .owner-grid > *, .story-panel > * { min-width: 0; }
 .category-card, .category-card__body, .category-card__title, .category-card__link, .editorial-card, .photo-feature, .visit-shop-card { min-width: 0; max-width: 100%; }
 .category-card__title, .editorial-card h3, .photo-feature h3, .feature-list h3, .section-title { overflow-wrap: anywhere; word-break: normal; }
-.category-card__title { font-size: clamp(2rem, 6vw, 3.3rem); line-height: .9; }
+.category-card__title { font-size: clamp(2.4rem, 4.5vw, 4.2rem); line-height: .9; overflow-wrap: normal; }
 .category-card__link { flex-wrap: wrap; white-space: normal; }
 .category-card__media img, .gallery-item img, .photo-feature__media img, .owner-photo img, .hero__photo img { max-width: 100%; }
 @media (max-width: 520px) {
   .container { width: min(calc(100% - 2rem), var(--max-width)); }
   .category-grid { gap: 2rem; }
-  .category-card__body { min-height: 10rem; padding: 1.1rem; }
-  .category-card__title { font-size: clamp(2rem, 12vw, 3rem); }
+  .category-card__body { min-height: 0; padding: 1.1rem 0 0; }
+  .category-card__title { margin-inline: 0; padding-inline: .08em; font-size: clamp(2rem, 12vw, 3rem); line-height: .96; overflow: visible; }
   .button { max-width: 100%; white-space: normal; }
 }
