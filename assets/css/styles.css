@@ -9,8 +9,8 @@
   --white: #dedbd2;
   --blue: #5270e6;
   --blue-deep: #3046c2;
-  --yellow: #e8c94c;
-  --yellow-soft: #d4b93d;
+  --yellow: #2b9a70;
+  --yellow-soft: #237f5c;
   --coral: #e5674d;
   --slate: #b5b9c6;
   --line: rgba(255, 253, 247, .2);
@@ -319,7 +319,7 @@ button, input { font: inherit; }
 .hero__grid { align-items: end; }
 .hero__grid > div { position: relative; z-index: 1; }
 .hero__grid:has(> :only-child), .page-hero__grid:has(> :only-child), .story-panel:has(> :only-child), .owner-grid:has(> :only-child) { grid-template-columns: 1fr; }
-.hero__photo { border-width: 1px; box-shadow: 18px 18px 0 rgba(232, 201, 76, .8); }
+.hero__photo { border-width: 1px; box-shadow: 18px 18px 0 rgba(43, 154, 112, .8); }
 .hero__photo::after { border-width: 1px; }
 .hero__photo figcaption { border-width: 1px; box-shadow: 5px 5px 0 var(--ink); }
 .category-section { background: var(--paper); border-block: 0; }
@@ -374,7 +374,7 @@ button, input { font: inherit; }
 /* Infinite Heroes emerald / black identity: preserve yellow logo accents, shift the system around them. */
 :root { --ink: #070a08; --ink-raised: #0d1511; --ink-soft: #b8c9c0; --paper: #111815; --paper-deep: #192820; --white: #f2f6f3; --blue: #8ed1b5; --blue-deep: #165c45; --yellow: #2b9a70; --yellow-soft: #237f5c; --coral: #1a6b50; --slate: #b8c9c0; --line: rgba(43,154,112,.3); --line-light: rgba(242,246,243,.22); }
 body { background: var(--paper); }
-.site-header { background: rgba(5,8,6,.94); border-bottom-color: rgba(216,255,90,.2); }
+.site-header { background: rgba(5,8,6,.94); border-bottom-color: rgba(43,154,112,.2); }
 .site-nav a:hover, .site-nav a[aria-current="page"] { color: var(--yellow); }
 .nav-cta, .button--dark { background: var(--ink); color: var(--white) !important; box-shadow: 4px 4px 0 var(--coral); }
 .button--primary { background: var(--yellow); color: var(--ink); box-shadow: 4px 4px 0 var(--coral); }
