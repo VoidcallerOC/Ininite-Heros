@@ -3,6 +3,7 @@ import 'server-only';
 import type { BusinessHour, CardGame, CardsContent, CatalogSection, CatalogType, CmsPageData, MediaAsset, PageSection, PublicSiteData, SocialLink, StoreEvent } from '@/lib/cms';
 import { fallbackPublicSiteData, fallbackPages, fallbackCatalogSections, fallbackCardsContent, fallbackCardGames } from '@/lib/fallback-content';
 import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server';
+import { upcomingOccurrences } from '@/lib/events';
 
 function resolveMediaValue(value: unknown, mediaById: Map<string, string>, mediaByUrl: Map<string, string>): unknown {
   if (typeof value === 'string') {
@@ -80,15 +81,11 @@ export async function getCatalogSections(catalogType: CatalogType): Promise<Cata
 
 export async function getPublishedEvents(): Promise<StoreEvent[]> {
   if (!isSupabaseConfigured()) return [];
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
-    .from('events')
-    .select('*')
-    .eq('published', true)
-    .gte('starts_at', new Date().toISOString())
-    .order('starts_at')
-    .limit(12);
-  return (data ?? []) as StoreEvent[];
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.from('events').select('*').eq('published', true).order('sort_order').order('starts_at').limit(100);
+    return error ? [] : upcomingOccurrences((data ?? []) as StoreEvent[]);
+  } catch { return []; }
 }
 
 export async function getPublicMedia(): Promise<MediaAsset[]> {

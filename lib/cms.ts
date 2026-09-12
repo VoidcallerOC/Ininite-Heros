@@ -110,11 +110,19 @@ export type CardsContent = {
 export type StoreEvent = {
   id: string;
   title: string;
+  category: string;
   description: string | null;
   starts_at: string;
   ends_at: string | null;
+  location: string;
   image_url: string | null;
+  image_alt: string | null;
   registration_url: string | null;
+  recurrence: 'none' | 'weekly';
+  recurrence_day: number | null;
+  timezone: string;
+  sort_order: number;
+  max_occurrences: number | null;
   published: boolean;
   created_at: string;
 };

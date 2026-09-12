@@ -99,11 +99,19 @@ function newYorkDateTimeToIso(value: string) {
 export const eventSchema = z.object({
   id: z.string().uuid().optional(),
   title: requiredText('Event title', 180),
+  category: requiredText('Category', 120).default('Community event'),
   description: z.string().trim().max(4000).nullable().optional(),
   starts_at: dateTimeLocal.transform(newYorkDateTimeToIso),
   ends_at: dateTimeLocal.transform(newYorkDateTimeToIso).nullable().optional(),
+  location: requiredText('Location', 240).default('Infinite Heroes Comics'),
   image_url: optionalUrl.optional(),
+  image_alt: z.string().trim().max(250).nullable().optional().default(null),
   registration_url: optionalUrl.optional(),
+  recurrence: z.enum(['none', 'weekly']).default('none'),
+  recurrence_day: z.coerce.number().int().min(0).max(6).nullable().optional().default(null),
+  timezone: z.literal('America/New_York').default('America/New_York'),
+  sort_order: z.coerce.number().int().min(0).max(999).default(0),
+  max_occurrences: z.coerce.number().int().min(1).max(520).nullable().optional().default(null),
   published: z.boolean(),
 });
 

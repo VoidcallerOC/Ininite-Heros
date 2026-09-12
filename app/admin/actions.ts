@@ -17,7 +17,7 @@ function validationMessage(error: { issues: Array<{ message: string }> }) {
 }
 
 function revalidatePublic() {
-  ['/', '/comics.html', '/cards.html', '/collectibles.html', '/about.html', '/visit.html', '/sitemap.xml'].forEach((path) => revalidatePath(path));
+  ['/', '/comics.html', '/cards.html', '/collectibles.html', '/events.html', '/about.html', '/visit.html', '/sitemap.xml'].forEach((path) => revalidatePath(path));
 }
 
 async function adminClient() {
@@ -190,15 +190,27 @@ export async function saveCardsContent(_state: ActionState, formData: FormData):
 }
 
 export async function saveEvent(_state: ActionState, formData: FormData): Promise<ActionState> {
-  const parsed = eventSchema.safeParse({ id: nullableFormValue(formData, 'id') || undefined, title: formData.get('title'), description: nullableFormValue(formData, 'description'), starts_at: formData.get('starts_at'), ends_at: nullableFormValue(formData, 'ends_at'), image_url: nullableFormValue(formData, 'image_url'), registration_url: nullableFormValue(formData, 'registration_url'), published: formBoolean(formData, 'published') });
+  const parsed = eventSchema.safeParse({ id: nullableFormValue(formData, 'id') || undefined, title: formData.get('title'), category: formData.get('category'), description: nullableFormValue(formData, 'description'), starts_at: formData.get('starts_at'), ends_at: nullableFormValue(formData, 'ends_at'), location: formData.get('location'), image_url: nullableFormValue(formData, 'image_url'), image_alt: nullableFormValue(formData, 'image_alt'), registration_url: nullableFormValue(formData, 'registration_url'), recurrence: formData.get('recurrence') || 'none', recurrence_day: nullableFormValue(formData, 'recurrence_day'), timezone: 'America/New_York', sort_order: formData.get('sort_order') || 0, max_occurrences: nullableFormValue(formData, 'max_occurrences'), published: formBoolean(formData, 'published') });
   if (!parsed.success) return failure(validationMessage(parsed.error));
   if (parsed.data.ends_at && parsed.data.ends_at < parsed.data.starts_at) return failure('End time must be after the start time.');
+  if (parsed.data.recurrence === 'weekly' && parsed.data.recurrence_day == null) return failure('Choose the weekday for a recurring event.');
+  if (parsed.data.image_url && !parsed.data.image_alt) return failure('Image alt text is required when an event has an image.');
   try { const supabase = await adminClient(); const { id, ...values } = parsed.data; const { error } = await (id ? supabase.from('events').update(values).eq('id', id) : supabase.from('events').insert(values)); if (error) return failure('The event could not be saved.'); revalidatePublic(); return success('Event saved.'); } catch { return failure('Authorization failed.'); }
 }
 
 export async function deleteEvent(_state: ActionState, formData: FormData): Promise<ActionState> {
   const id = nullableFormValue(formData, 'id'); if (!id) return failure('Missing event ID.');
   try { const { error } = await (await adminClient()).from('events').delete().eq('id', id); if (error) return failure('The event could not be deleted.'); revalidatePublic(); return success('Event deleted.'); } catch { return failure('Authorization failed.'); }
+}
+
+export async function duplicateEvent(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const id = nullableFormValue(formData, 'id'); if (!id) return failure('Missing event ID.');
+  try { const supabase = await adminClient(); const { data: event, error } = await supabase.from('events').select('*').eq('id', id).single(); if (error || !event) return failure('The event could not be found.'); const { id: _id, created_at: _created, updated_at: _updated, title, ...copy } = event; const result = await supabase.from('events').insert({ ...copy, title: `${title} (copy)`, published: false }); if (result.error) return failure('The event could not be duplicated.'); revalidatePublic(); return success('Event duplicated as a draft.'); } catch { return failure('Authorization failed.'); }
+}
+
+export async function reorderEvent(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const id = nullableFormValue(formData, 'id'); const sortOrder = Number(formData.get('sort_order')); if (!id || !Number.isInteger(sortOrder) || sortOrder < 0 || sortOrder > 999) return failure('Choose a valid display order.');
+  try { const { error } = await (await adminClient()).from('events').update({ sort_order: sortOrder }).eq('id', id); if (error) return failure('The event order could not be saved.'); revalidatePublic(); return success('Event order saved.'); } catch { return failure('Authorization failed.'); }
 }
 
 export async function saveSetting(_state: ActionState, formData: FormData): Promise<ActionState> {

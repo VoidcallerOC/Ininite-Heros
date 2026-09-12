@@ -8,6 +8,7 @@ const navigation = [
   { href: '/comics.html', label: 'Comics', page: 'comics' },
   { href: '/cards.html', label: 'Cards', page: 'cards' },
   { href: '/collectibles.html', label: 'Collectibles', page: 'collectibles' },
+  { href: '/events.html', label: 'Events', page: 'events' },
   { href: '/about.html', label: 'About', page: 'about' },
 ];
 

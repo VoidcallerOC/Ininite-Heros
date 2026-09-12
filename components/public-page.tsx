@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { CardGame, CardsContent, CatalogSection, CmsPageData, Json, PublicSiteData, StoreEvent } from '@/lib/cms';
 import { contentItems, contentString, contentStrings } from '@/lib/cms';
 import { formatHours, SiteShell } from '@/components/site-shell';
+import { formatEventDate, formatEventTime } from '@/lib/events';
 
 const arrow = <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" strokeLinecap="square" strokeWidth="2.4" d="M5 12h13M13 6l6 6-6 6" /></svg>;
 
@@ -72,6 +73,10 @@ function CardGames({ content, games }: { content: Record<string, Json>; games: C
 
 function MagicProgramming({ content }: { content: CardsContent }) {
   return <section className="magic-programming" id="magic" aria-labelledby="magic-title"><div className="container magic-programming__grid"><div><p className="eyebrow">{content.magic_eyebrow}</p><h2 className="section-title" id="magic-title">{content.magic_title}</h2><p className="section-intro">{content.magic_description}</p>{content.announcement && <p className="magic-programming__announcement">{content.announcement}</p>}</div><div className="magic-programming__details"><div><span>{content.magic_event_frequency}</span><strong>{content.magic_event_wording}</strong></div><div><span>Start time</span><strong>{content.magic_event_time}</strong></div><div><span>Release calendar</span><strong>{content.magic_prerelease_text}</strong></div></div></div></section>;
+}
+
+export function EventsList({ events }: { events: StoreEvent[] }) {
+  return <section className="events-section" aria-labelledby="upcoming-events-title"><div className="container"><div className="section-lede"><div><p className="eyebrow">Community calendar</p><h2 className="section-title" id="upcoming-events-title">Upcoming events.</h2></div><p className="section-intro">Join the table, meet other fans, and check back for prereleases and special events.</p></div>{events.length ? <div className="events-grid">{events.map((event) => <article className="event-card" key={event.id}>{event.image_url && <img src={event.image_url} alt={event.image_alt || event.title} width="720" height="420" loading="lazy" />}<div className="event-card__body"><p className="eyebrow">{event.category}</p><h3>{event.title}</h3><p>{event.description}</p><dl><div><dt>Date</dt><dd>{formatEventDate(event.starts_at)}</dd></div><div><dt>Time</dt><dd>{formatEventTime(event.starts_at)}{event.ends_at ? ` – ${formatEventTime(event.ends_at)}` : ''} ET</dd></div><div><dt>Where</dt><dd>{event.location}</dd></div></dl>{event.registration_url && <a className="button button--primary" href={event.registration_url} target="_blank" rel="noopener">Register {arrow}</a>}</div></article>)}</div> : <div className="events-empty"><h3>Nothing scheduled yet.</h3><p>Check back soon or contact the shop for the latest calendar.</p></div>}</div></section>;
 }
 
 function VisitDetails({ content, data }: { content: Record<string, Json>; data: PublicSiteData }) {
