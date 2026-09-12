@@ -404,3 +404,18 @@ body { background: var(--paper); }
 .hero .display em, .stacked-words span:nth-child(2), .stacked-words span:nth-child(3), .page-hero .display em { color: #2b9a70 !important; }
 .button--primary, .nav-cta { background: #2b9a70 !important; color: #070a08 !important; border-color: #2b9a70 !important; box-shadow: 4px 4px 0 #070a08 !important; }
 .hero__photo, .page-hero__visual { box-shadow: 10px 10px 0 #2b9a70 !important; }
+
+/* Responsive alignment safeguards: prevent narrow cards and grid children from clipping content. */
+.category-grid > *, .inside-gallery > *, .photo-feature-grid > *, .editorial-card-grid > *, .visit-shop-grid > *, .hero__grid > *, .owner-grid > *, .story-panel > * { min-width: 0; }
+.category-card, .category-card__body, .category-card__title, .category-card__link, .editorial-card, .photo-feature, .visit-shop-card { min-width: 0; max-width: 100%; }
+.category-card__title, .editorial-card h3, .photo-feature h3, .feature-list h3, .section-title { overflow-wrap: anywhere; word-break: normal; }
+.category-card__title { font-size: clamp(2rem, 6vw, 3.3rem); line-height: .9; }
+.category-card__link { flex-wrap: wrap; white-space: normal; }
+.category-card__media img, .gallery-item img, .photo-feature__media img, .owner-photo img, .hero__photo img { max-width: 100%; }
+@media (max-width: 520px) {
+  .container { width: min(calc(100% - 2rem), var(--max-width)); }
+  .category-grid { gap: 2rem; }
+  .category-card__body { min-height: 10rem; padding: 1.1rem; }
+  .category-card__title { font-size: clamp(2rem, 12vw, 3rem); }
+  .button { max-width: 100%; white-space: normal; }
+}
