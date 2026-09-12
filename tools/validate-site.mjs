@@ -53,7 +53,7 @@ for (const file of htmlFiles) {
     ['main landmark', /<main[\s>]/i],
     ['skip link', /class=["'][^"']*skip-link/i],
     ['responsive menu control', /class=["']menu-toggle/i],
-    ['shared stylesheet', /href=["']assets\/css\/styles\.css["']/i],
+    ['shared stylesheet', /href=["']assets\/css\/styles\.css(?:\?[^"']+)?["']/i],
     ['shared navigation script', /src=["']assets\/js\/site\.js["']/i],
   ]) {
     if (!requirement[1].test(html)) errors.push(`${label}: missing ${requirement[0]}`);
