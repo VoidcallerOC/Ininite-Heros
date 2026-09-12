@@ -372,7 +372,7 @@ button, input { font: inherit; }
 .hero__grid:has(> :only-child), .page-hero__grid:has(> :only-child), .story-panel:has(> :only-child), .owner-grid:has(> :only-child) { grid-template-columns: 1fr; }
 
 /* Infinite Heroes emerald / black identity: preserve yellow logo accents, shift the system around them. */
-:root { --ink: #050806; --ink-raised: #0d1711; --ink-soft: #b8c7bd; --paper: #10231b; --paper-deep: #173426; --white: #f5f7f2; --blue: #2f9d68; --blue-deep: #0c5c3c; --yellow: #d8ff5a; --yellow-soft: #b9e646; --coral: #2c8f5d; --slate: #b8c7bd; --line: rgba(216,255,90,.2); --line-light: rgba(245,247,242,.24); }
+:root { --ink: #030604; --ink-raised: #07130d; --ink-soft: #b8d2c2; --paper: #0b2116; --paper-deep: #123b27; --white: #f4faf6; --blue: #39d98a; --blue-deep: #087a4b; --yellow: #00a86b; --yellow-soft: #008f5a; --coral: #075b39; --slate: #b8d2c2; --line: rgba(0,168,107,.34); --line-light: rgba(244,250,246,.24); }
 body { background: var(--paper); }
 .site-header { background: rgba(5,8,6,.94); border-bottom-color: rgba(216,255,90,.2); }
 .site-nav a:hover, .site-nav a[aria-current="page"] { color: var(--yellow); }
@@ -387,3 +387,17 @@ body { background: var(--paper); }
 .feature-list__number { color: var(--yellow); text-decoration: none; }
 .feature-list__number:hover, .feature-list__number:focus-visible { color: var(--white); }
 [data-social][hidden] { display: none; }
+.site-nav a:not(.nav-cta)::after { background: var(--yellow); }
+.nav-cta, .button--dark { border-color: var(--yellow); background: var(--ink); box-shadow: 4px 4px 0 var(--yellow); }
+.button--primary { border-color: var(--yellow); background: var(--yellow); color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+.button--secondary { border-color: var(--yellow); }
+.button--secondary:hover, .button--primary:hover { background: var(--blue); color: var(--ink); }
+.hero, .inside-section, .site-footer { background: var(--ink); }
+.category-section, .content-section--paper-deep, .owner-section { background: var(--paper-deep); }
+.intro-card, .category-card { border-color: var(--yellow); }
+.category-card:hover { box-shadow: 10px 10px 0 var(--yellow); }
+.hero__photo, .page-hero__visual { border-color: var(--yellow); box-shadow: 10px 10px 0 var(--yellow); }
+.hero__photo::after, .hero::after, .eyebrow::before, .hero__meta li::before { background: var(--yellow); }
+.stacked-words span:nth-child(2), .category-card__link, .eyebrow { color: var(--blue); }
+.eyebrow--light, .page-hero--ink .eyebrow { color: var(--blue); }
+.feature-list__number, .category-card__number { color: var(--yellow); }
