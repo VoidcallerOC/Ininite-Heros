@@ -12,7 +12,7 @@ function walk(directory) {
     const fullPath = join(directory, entry);
     if (statSync(fullPath).isDirectory()) {
       walk(fullPath);
-    } else if (entry.endsWith('.html')) {
+    } else if (entry.endsWith('.html') && !['admin.html', 'cards.html'].includes(entry)) {
       htmlFiles.push(fullPath);
     }
   }

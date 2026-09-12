@@ -1,2 +1,6 @@
 .validation/
 .DS_Store
+
+data/analytics.json
+uploads/*
+!uploads/.gitkeep

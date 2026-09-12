@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = process.cwd();
-const pages = ['index.html', 'comics.html', 'cards.html', 'collectibles.html', 'about.html', 'visit.html'];
+const pages = ['index.html', 'comics.html', 'collectibles.html', 'about.html', 'visit.html'];
 const errors = [];
 const imagePattern = /<img\b[^>]*>/gi;
 const attribute = (tag, name) => tag.match(new RegExp(`\\b${name}=["']([^"']*)["']`, 'i'))?.[1] ?? null;

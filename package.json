@@ -7,6 +7,8 @@
     "check": "node tools/validate-site.mjs",
     "check:content": "node tools/validate-content.mjs",
     "verify": "npm run check && npm run check:content",
-    "start": "python3 -m http.server 8080"
-  }
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "type": "module"
 }
