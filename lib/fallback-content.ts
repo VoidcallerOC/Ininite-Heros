@@ -60,5 +60,4 @@ export const fallbackCardGames: import('@/lib/cms').CardGame[] = [
   { id: 'fallback-yu-gi-oh', name: 'Yu-Gi-Oh!', slug: 'yu-gi-oh', description: 'Yu-Gi-Oh! cards and the current card conversation at Infinite Heroes.', image_url: null, image_alt: null, cta_label: null, cta_href: null, active: true, sort_order: 50 },
   { id: 'fallback-one-piece', name: 'One Piece', slug: 'one-piece', description: 'One Piece Card Game releases and the current trading-card scene at Infinite Heroes.', image_url: null, image_alt: null, cta_label: null, cta_href: null, active: true, sort_order: 60 },
   { id: 'fallback-flesh-and-blood', name: 'Flesh and Blood', slug: 'flesh-and-blood', description: 'Flesh and Blood cards for players and collectors.', image_url: null, image_alt: null, cta_label: null, cta_href: null, active: true, sort_order: 70 },
-  { id: 'fallback-more', name: 'More Games', slug: 'more', description: 'The card scene changes. Ask the shop what just arrived and what is being played next.', image_url: null, image_alt: null, cta_label: null, cta_href: null, active: true, sort_order: 80 },
 ];
