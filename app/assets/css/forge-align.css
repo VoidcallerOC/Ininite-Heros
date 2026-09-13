@@ -345,3 +345,57 @@ body {
 .category-card__link {
   color: #2b9a70;
 }
+
+/* Public catalog cards: keep the dark editorial treatment, but make every content layer readable. */
+.catalog-sections {
+  background: #101114;
+  color: #f3efe6;
+}
+
+.catalog-sections .section-title,
+.catalog-sections .catalog-section__copy h3 {
+  color: #fffdf7;
+}
+
+.catalog-sections .section-lede,
+.catalog-sections .catalog-section {
+  border-color: rgba(243, 239, 230, .38);
+}
+
+.catalog-sections .catalog-number-nav a,
+.catalog-sections .catalog-section__copy > p:not(.eyebrow) {
+  color: #e8e5dc;
+}
+
+.catalog-sections .catalog-number-nav a:hover,
+.catalog-sections .catalog-number-nav a:focus-visible {
+  color: #ffd76a;
+}
+
+.catalog-sections .catalog-number-nav a span,
+.catalog-sections .catalog-section__number,
+.catalog-sections .eyebrow {
+  color: #ffd76a;
+}
+
+.catalog-sections .catalog-section__media {
+  border: 1px solid rgba(243, 239, 230, .32);
+  background: #252832;
+}
+
+.catalog-sections .catalog-section__placeholder {
+  color: #f3efe6;
+}
+
+.catalog-sections .button--primary {
+  background: #ffd76a;
+  color: #14151a;
+  border-color: #ffd76a;
+  box-shadow: 4px 4px 0 #000;
+}
+
+.catalog-sections .button--primary:hover,
+.catalog-sections .button--primary:focus-visible {
+  background: #fff4bf;
+  color: #14151a;
+}
