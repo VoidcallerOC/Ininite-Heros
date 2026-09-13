@@ -288,7 +288,7 @@ insert into public.business_hours (day_of_week, label, open_time, close_time, is
   (4, 'Thursday', '11:00', '19:00', false, 4),
   (5, 'Friday', '11:00', '19:00', false, 5),
   (6, 'Saturday', '11:00', '19:00', false, 6),
-  (0, 'Sunday', '12:00', '17:00', false, 7)
+  (0, 'Sunday', '12:00', '17:00', false, 0)
 on conflict (day_of_week) do nothing;
 
 -- After creating the first Supabase Auth user, promote it manually in the SQL editor:
