@@ -35,12 +35,13 @@ export async function getPublishedPage(slug: string): Promise<CmsPageData | null
   try {
     const supabase = await createSupabaseServerClient();
     const { data: page, error } = await supabase.from('pages').select('*').eq('slug', slug).eq('published', true).maybeSingle();
-    if (error || !page) return fallbackPages[slug] ?? null;
-    const [{ data: sections, error: sectionError }, { data: media }] = await Promise.all([
+    if (error) return fallbackPages[slug] ?? null;
+    if (!page) return null;
+    const [{ data: sections, error: sectionError }, { data: media, error: mediaError }] = await Promise.all([
       supabase.from('page_sections').select('*').eq('page_id', page.id).eq('published', true).order('sort_order'),
       supabase.from('media').select('id,url'),
     ]);
-    if (sectionError) return fallbackPages[slug] ?? null;
+    if (sectionError || mediaError) return fallbackPages[slug] ?? null;
     const mediaById = new Map((media ?? []).map((asset) => [asset.id, asset.url]));
     const mediaByUrl = new Map((media ?? []).map((asset) => [asset.url, asset.url]));
     const resolvedSections = (sections ?? []).map((section) => ({ ...section, content: resolveMediaValue(section.content, mediaById, mediaByUrl) }));
@@ -54,16 +55,16 @@ export async function getActiveCardGames(): Promise<CardGame[]> {
   try {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase.from('card_games').select('*').eq('active', true).order('sort_order');
-    return error || !data?.length ? fallbackCardGames : data as CardGame[];
+    return error ? fallbackCardGames : (data ?? []) as CardGame[];
   } catch { return fallbackCardGames; }
 }
 
-export async function getCardsContent(): Promise<CardsContent> {
+export async function getCardsContent(): Promise<CardsContent | null> {
   if (!isSupabaseConfigured()) return fallbackCardsContent;
   try {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase.from('card_page_content').select('*').eq('id', 'default').maybeSingle();
-    return error || !data ? fallbackCardsContent : data as CardsContent;
+    return error ? fallbackCardsContent : data as CardsContent | null;
   } catch { return fallbackCardsContent; }
 }
 
@@ -72,7 +73,7 @@ export async function getCatalogSections(catalogType: CatalogType): Promise<Cata
   try {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase.from('catalog_sections').select('*').eq('catalog_type', catalogType).eq('enabled', true).order('sort_order').order('created_at');
-    if (error || !data?.length) return fallbackCatalogSections[catalogType];
+    if (error) return fallbackCatalogSections[catalogType];
     const media = await supabase.from('media').select('id,url');
     const mediaById = new Map((media.data ?? []).map((asset) => [asset.id, asset.url]));
     return (data as CatalogSection[]).map((section) => ({ ...section, image_url: section.image_url?.startsWith('media://') ? mediaById.get(section.image_url.slice('media://'.length)) || null : section.image_url }));
