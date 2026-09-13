@@ -1,20 +1,13 @@
 (() => {
-  const SHOP_TIME_ZONE = 'America/New_York';
-  const HOURS = {
-    0: null,
-    1: null,
-    2: { open: 11 * 60, close: 16 * 60 },
-    3: { open: 11 * 60, close: 19 * 60 },
-    4: { open: 11 * 60, close: 19 * 60 },
-    5: { open: 11 * 60, close: 19 * 60 },
-    6: { open: 11 * 60, close: 19 * 60 },
-  };
+  const SHOP_TIME_ZONE = window.__IH_TIME_ZONE__ || 'America/New_York';
+  const HOURS = window.__IH_HOURS__ || {};
   const statusFormatter = new Intl.DateTimeFormat('en-US', {
     timeZone: SHOP_TIME_ZONE,
     weekday: 'short',
     hour: 'numeric',
     minute: '2-digit',
     hour12: false,
+    hourCycle: 'h23',
   });
   const dayFormatter = new Intl.DateTimeFormat('en-US', {
     timeZone: SHOP_TIME_ZONE,
@@ -38,13 +31,15 @@
     .map(({ type, value }) => [type, value]));
 
   const getWeekdayNumber = (weekday) => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(weekday);
+  const dateKey = (parts) => `${parts.year}-${String(parts.month).padStart(2, '0')}-${String(parts.day).padStart(2, '0')}`;
 
   // Convert a wall-clock time in the shop's timezone into a real Date, including DST.
   const zonedDate = (year, month, day, minutes) => {
     let result = new Date(Date.UTC(year, month - 1, day, Math.floor(minutes / 60), minutes % 60));
     for (let attempt = 0; attempt < 2; attempt += 1) {
       const parts = getDayParts(result);
-      const wallClock = Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day), Number(getParts(result).hour), Number(getParts(result).minute));
+      const current = getParts(result);
+      const wallClock = Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day), Number(current.hour), Number(current.minute));
       const wanted = Date.UTC(year, month - 1, day, Math.floor(minutes / 60), minutes % 60);
       result = new Date(result.getTime() + wanted - wallClock);
     }
@@ -52,14 +47,15 @@
   };
 
   const formatOpening = (date) => {
+    if (!date) return 'the next scheduled opening';
     const parts = getDayParts(date);
-    const day = getWeekdayNumber(parts.weekday);
     const today = getDayParts(new Date());
-    const dayLabel = parts.year === today.year && parts.month === today.month && parts.day === today.day
+    const day = getWeekdayNumber(parts.weekday);
+    const dayLabel = dateKey(parts) === dateKey(today)
       ? 'today'
-      : parts.year === today.year && parts.month === today.month && Number(parts.day) === Number(today.day) + 1
+      : dateKey(parts) === dateKey(getDayParts(new Date(Date.now() + 24 * 60 * 60 * 1000)))
         ? 'tomorrow'
-        : parts.weekday;
+        : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day];
     return `${dayLabel} at ${displayTimeFormatter.format(date)}`;
   };
 
@@ -73,7 +69,7 @@
     const currentMinutes = Number(currentParts.hour) * 60 + Number(currentParts.minute);
     const today = getDayParts(now);
     const todayHours = HOURS[currentDay];
-    let isOpen = Boolean(todayHours && currentMinutes >= todayHours.open && currentMinutes < todayHours.close);
+    const isOpen = Boolean(todayHours && currentMinutes >= todayHours.open && currentMinutes < todayHours.close);
     let target;
     let action;
 
@@ -97,10 +93,11 @@
     }
 
     const state = isOpen ? 'open' : 'closed';
+    const opening = formatOpening(target);
     status.classList.toggle('status-pill--open', isOpen);
     status.dataset.state = state;
-    status.setAttribute('aria-label', `Shop is ${state}. ${action.toLowerCase()} ${formatOpening(target)}`);
-    status.innerHTML = `<span class="status-pill__dot" aria-hidden="true"></span> ${state.toUpperCase()} · ${action} ${formatOpening(target)}`;
+    status.setAttribute('aria-label', `Shop is ${state}. ${action.toLowerCase()} ${opening}`);
+    status.innerHTML = `<span class="status-pill__dot" aria-hidden="true"></span> ${state.toUpperCase()} · ${action} ${opening}`;
   };
 
   const toggle = document.querySelector('.menu-toggle');
