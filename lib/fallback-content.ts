@@ -10,8 +10,8 @@ export const fallbackPublicSiteData: PublicSiteData = {
     address_line_1: '1098 Main St', address_line_2: 'Watertown, CT 06795', phone_display: '860-417-2559', phone_e164: '+18604172559', email: 'paul@infiniteheroes.net', time_zone: 'America/New_York', maps_url: 'https://maps.google.com/?q=1098+Main+St,+Watertown,+CT+06795', copyright_location: 'Watertown, Connecticut',
   },
   hours: [
-    ['Monday', null, null, true], ['Tuesday', '11:00', '16:00', false], ['Wednesday', '11:00', '19:00', false], ['Thursday', '11:00', '19:00', false], ['Friday', '11:00', '19:00', false], ['Saturday', '11:00', '19:00', false], ['Sunday', '12:00', '17:00', false],
-  ].map(([label, open_time, close_time, is_closed], index) => ({ id: `fallback-${index}`, day_of_week: index, label, open_time, close_time, is_closed, sort_order: index } as BusinessHour)),
+    [0, 'Sunday', '12:00', '17:00', false], [1, 'Monday', null, null, true], [2, 'Tuesday', '11:00', '16:00', false], [3, 'Wednesday', '11:00', '19:00', false], [4, 'Thursday', '11:00', '19:00', false], [5, 'Friday', '11:00', '19:00', false], [6, 'Saturday', '11:00', '19:00', false],
+  ].map(([day_of_week, label, open_time, close_time, is_closed], index) => ({ id: `fallback-${index}`, day_of_week, label, open_time, close_time, is_closed, sort_order: index } as BusinessHour)),
   socials: [{ id: 'fallback-facebook', platform: 'facebook', label: 'Facebook', url: 'https://www.facebook.com/infiniteheroescomics/', sort_order: 10, active: true }, { id: 'fallback-instagram', platform: 'instagram', label: 'Instagram', url: 'https://www.instagram.com/infiniteheroescomics/', sort_order: 20, active: true }],
 };
 
