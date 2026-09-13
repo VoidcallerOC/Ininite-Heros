@@ -78,7 +78,7 @@ const cardGameLogoFallbacks: Record<string, string> = {
 };
 
 function gameLogoUrl(game: CardGame): string | null {
-  return cardGameLogoFallbacks[game.slug] || game.image_url || null;
+  return cardGameLogoFallbacks[game.slug] || null;
 }
 
 function CardGames({ content, games }: { content: Record<string, Json>; games: CardGame[] }) {
