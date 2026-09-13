@@ -67,13 +67,23 @@ function RichText({ content, about = false }: { content: Record<string, Json>; a
   return <section className="content-section"><div className="container story-panel"><div className="story-panel__copy"><p className="eyebrow">{contentString(content, 'eyebrow')}</p><h2 className="section-title">{contentString(content, 'title')}</h2>{paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div></div></section>;
 }
 
-function isGameLogo(game: CardGame): boolean {
-  const source = `${game.image_url || ''} ${game.image_alt || ''}`.toLowerCase();
-  return source.includes('logo');
+const cardGameLogoFallbacks: Record<string, string> = {
+  magic: '/assets/images/card-logos/magic-logo.png',
+  pokemon: '/assets/images/card-logos/pokemon-logo.png',
+  lorcana: '/assets/images/card-logos/lorcana-logo.png',
+  'star-wars': '/assets/images/card-logos/star-wars-logo.png',
+  'yu-gi-oh': '/assets/images/card-logos/yu-gi-oh-logo.png',
+  'one-piece': '/assets/images/card-logos/one-piece-logo.png',
+  'flesh-and-blood': '/assets/images/card-logos/flesh-and-blood-logo.png',
+};
+
+function gameLogoUrl(game: CardGame): string | null {
+  if (game.image_url) return game.image_url;
+  return cardGameLogoFallbacks[game.slug] || null;
 }
 
 function CardGames({ content, games }: { content: Record<string, Json>; games: CardGame[] }) {
-  return <section className="content-section content-section--paper-deep"><div className="container"><SectionHeading content={content} defaultTitle="Card games" />{games.length ? <div className="editorial-card-grid">{games.map((game, index) => <article className="editorial-card" key={game.id}>{isGameLogo(game) ? <div className="editorial-card__media"><img src={game.image_url!} alt={game.image_alt || `${game.name} logo`} width="720" height="480" loading="lazy" /></div> : <div className="editorial-card__placeholder" role="img" aria-label={`${game.name} logo is not currently available`}>Logo coming soon</div>}<span className="editorial-card__index">{String(index + 1).padStart(2, '0')}</span><h3>{game.name}</h3><p>{game.description}</p></article>)}</div> : <div className="admin-empty"><strong>{contentString(content, 'emptyTitle')}</strong><p>{contentString(content, 'emptyBody')}</p></div>}</div></section>;
+  return <section className="content-section content-section--paper-deep"><div className="container"><SectionHeading content={content} defaultTitle="Card games" />{games.length ? <div className="editorial-card-grid">{games.map((game, index) => { const logoUrl = gameLogoUrl(game); return <article className="editorial-card" key={game.id}>{logoUrl ? <div className="editorial-card__media"><img src={logoUrl} alt={game.image_alt || `${game.name} logo`} width="720" height="480" loading="lazy" /></div> : <div className="editorial-card__placeholder" role="img" aria-label={`${game.name} logo is not currently available`}>Logo coming soon</div>}<span className="editorial-card__index">{String(index + 1).padStart(2, '0')}</span><h3>{game.name}</h3><p>{game.description}</p></article>; })}</div> : <div className="admin-empty"><strong>{contentString(content, 'emptyTitle')}</strong><p>{contentString(content, 'emptyBody')}</p></div>}</div></section>;
 }
 
 function MagicProgramming({ content }: { content: CardsContent }) {
