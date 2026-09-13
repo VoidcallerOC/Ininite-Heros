@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { del } from '@vercel/blob';
 import { z } from 'zod';
 import { requireAdmin } from '@/lib/auth';
@@ -240,4 +241,5 @@ export async function saveHour(_state: ActionState, formData: FormData): Promise
 export async function signOut() {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
+  redirect('/admin/login?message=You%20have%20been%20signed%20out.');
 }
