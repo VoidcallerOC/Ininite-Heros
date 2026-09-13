@@ -136,6 +136,7 @@ body { min-height: 100vh; }
 .events-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
 .event-card { overflow: hidden; border: 1px solid rgba(43,154,112,.25); background: #0d1511; }
 .event-card > img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.event-card > img.event-card__image--magic { object-fit: contain; object-position: center; padding: 2.5rem 1.5rem; background: #0d1511; }
 .event-card__body { padding: 1.4rem; }
 .event-card__body h3 { margin: .35rem 0 .75rem; font-size: clamp(1.35rem, 2vw, 2rem); }
 .event-card__body > p:not(.eyebrow) { min-height: 4.5rem; color: #b8c9c0; }
