@@ -17,9 +17,9 @@ export function ActionForm({ action, children, className = 'admin-form', submitL
 
 export function DeleteForm({ action, id, label = 'Delete' }: Readonly<{ action: ServerAction; id: string; label?: string }>) {
   const [state, formAction, pending] = useActionState(action, initialActionState);
-  return <form action={formAction} style={{ display: 'inline' }}>
+  return <form action={formAction} style={{ display: 'inline' }} onSubmit={(event) => { if (!window.confirm('Delete this item? This cannot be undone.')) event.preventDefault(); }}>
     <input type="hidden" name="id" value={id} />
     <button className="admin-button admin-button--danger" type="submit" disabled={pending}>{pending ? 'Deleting…' : label}</button>
-    {state.status === 'error' && <span className="admin-notice admin-notice--error" role="status">{state.message}</span>}
+    {state.status !== 'idle' && <span className={`admin-notice admin-notice--${state.status}`} role="status">{state.message}</span>}
   </form>;
 }
