@@ -456,6 +456,14 @@ body {
   object-fit: contain;
 }
 
+.content-section--paper-deep .editorial-card__media img.card-game-logo--pokemon,
+.content-section--paper-deep .editorial-card__media img.card-game-logo--lorcana,
+.content-section--paper-deep .editorial-card__media img.card-game-logo--yu-gi-oh {
+  width: 72%;
+  height: 78%;
+  margin: auto;
+}
+
 .content-section--paper-deep .editorial-card__placeholder {
   color: #8ed1b5;
   font-family: "DM Mono", ui-monospace, monospace;
