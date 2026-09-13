@@ -10,7 +10,7 @@ Phase 2 global business and homepage editing workflows are documented in [PHASE2
 | --- | --- | --- |
 | Public web application | Next.js 16 App Router | Renders each public page from published CMS records while preserving `/comics.html`, `/cards.html`, `/collectibles.html`, `/about.html`, and `/visit.html`. |
 | Content database | Supabase Postgres | Stores settings, pages, sections, media metadata, card games, events, social links, hours, profiles, and analytics events. |
-| Authentication | Supabase Auth magic links | Sends passwordless sign-in links; users must also hold an explicitly assigned `admin` profile role. |
+| Authentication | Supabase Auth email/password | Authenticates with administrator credentials; users must also hold an explicitly assigned `admin` profile role. |
 | Authorization | Server action guards + Postgres RLS | Each CMS mutation calls `requireAdmin`; Postgres independently restricts writes and analytics reads to `admin` accounts. |
 | Media storage | Vercel Blob + CMS media records | Authenticated admins can upload image files through the protected media route; bundled current photography remains available under `/assets`. |
 | Analytics | First-party Next route + server-only Supabase client | Stores only page path, origin-only referrer, anonymous session UUID, and timestamp. It is visible only in the admin dashboard. |
@@ -22,8 +22,8 @@ Phase 2 global business and homepage editing workflows are documented in [PHASE2
 
 1. Create a Supabase project and copy `.env.example` to `.env.local` for local development. Populate all required variables.
 2. Apply the migration at `supabase/migrations/20260912103000_cms_foundation.sql` through the Supabase SQL editor or `supabase db push`. It creates tables, indexes, RLS policies, functions, and the current Infinite Heroes content seed.
-3. In **Supabase Authentication**, enable Email / magic-link sign-in. Add `http://localhost:3000/api/auth/callback` and `https://YOUR-DOMAIN/api/auth/callback` to the redirect allow list.
-4. Use `/admin/login` once with the owner email. Then, in the Supabase SQL editor, explicitly grant that account access:
+3. In **Supabase Authentication**, enable the Email provider and ensure the administrator Auth user has a password. No callback URL is required for the email/password flow.
+4. Use `/admin/login` with the administrator email and password. Then, in the Supabase SQL editor, explicitly grant that account access:
 
    ```sql
    update public.profiles
@@ -42,12 +42,12 @@ Phase 2 global business and homepage editing workflows are documented in [PHASE2
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Browser and server | Supabase publishable/anon key; RLS enforces public and admin access boundaries. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes for analytics | Server only | Writes anonymous analytics events. It is never imported by client code. |
 | `BLOB_READ_WRITE_TOKEN` | Yes for uploads | Server only | Allows the authenticated `/api/admin/media/upload` route to create Vercel Blob objects. |
-| `NEXT_PUBLIC_SITE_URL` | Recommended | Browser and server | Canonical site origin and Supabase magic-link callback origin. |
+| `NEXT_PUBLIC_SITE_URL` | Recommended | Browser and server | Canonical site origin. |
 | `CMS_INTEGRATION_TESTS` | Test only | Local test process | Set to `1` only when intentionally running live connectivity and CRUD tests. Do not set in Vercel. |
 
 ## Admin authentication and protection
 
-The `/admin/login` page uses Supabase passwordless email links. Signing in alone is not sufficient. The database trigger creates a `profiles` row with the conservative `editor` default; an existing administrator must promote the intended account to `admin` explicitly. The protected admin route layout then calls `requireAdmin`, which retrieves the verified Auth user from Supabase and confirms `profiles.role = 'admin'` before rendering any CMS interface. Every mutation is a server action that repeats this check. Row Level Security policies independently prevent anonymous or non-admin writes, even if a client bypasses the UI.
+The `/admin/login` page uses Supabase email/password authentication. Signing in alone is not sufficient. The database trigger creates a `profiles` row with the conservative `editor` default; an existing administrator must promote the intended account to `admin` explicitly. The protected admin route layout then calls `requireAdmin`, which retrieves the verified Auth user from Supabase and confirms `profiles.role = 'admin'` before rendering any CMS interface. Every mutation is a server action that repeats this check. Row Level Security policies independently prevent anonymous or non-admin writes, even if a client bypasses the UI.
 
 ## Public content retrieval
 
@@ -83,4 +83,4 @@ npm run test:integration     # requires CMS_INTEGRATION_TESTS=1 plus Supabase va
 
 ## Manual configuration still required
 
-No Supabase or Vercel project credentials were available in this repository, so applying the SQL migration, adding Vercel environment variables, configuring Supabase email delivery and redirect allow-lists, promoting the initial admin account, and creating a Vercel Blob store must be completed by the project owner. The application build, static architecture validation, content seed validation, and unit tests can run without those credentials; live database and authenticated end-to-end tests cannot truthfully be claimed until the credentials are configured.
+No Supabase or Vercel project credentials were available in this repository, so applying the SQL migration, adding Vercel environment variables, enabling the Supabase Email provider, creating or setting a password for the administrator Auth user, promoting that account, and creating a Vercel Blob store must be completed by the project owner. The application build, static architecture validation, content seed validation, and unit tests can run without those credentials; live database and authenticated end-to-end tests cannot truthfully be claimed until the credentials are configured.
