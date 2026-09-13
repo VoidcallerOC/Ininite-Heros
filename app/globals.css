@@ -52,7 +52,7 @@ body { min-height: 100vh; }
 .admin-empty { padding: 2rem; border: 1px dashed rgba(43,154,112,.36); border-radius: .6rem; color: #b8c9c0; text-align: center; }
 .admin-login { display: grid; min-height: 100vh; place-items: center; padding: 1rem; background: radial-gradient(circle at top right, rgba(43,154,112,.2), transparent 30%), #070a08; }
 .admin-login__panel { width: min(100%, 30rem); padding: 2rem; border: 1px solid rgba(43,154,112,.3); border-radius: 1rem; background: #0d1511; }
-.admin-login__logo { width: 8rem; margin-bottom: 1.5rem; }
+.admin-login__logo { display: block; width: min(100%, 13rem); height: auto; aspect-ratio: 620 / 394; margin: 0 auto 1.75rem; object-fit: contain; }
 .admin-login h1 { margin: 0; font-size: 2.1rem; }
 .admin-login p { color: #b8c9c0; }
 .admin-login form { display: grid; gap: 1rem; margin-top: 1.5rem; }

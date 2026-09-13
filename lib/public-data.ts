@@ -54,8 +54,18 @@ export async function getActiveCardGames(): Promise<CardGame[]> {
   if (!isSupabaseConfigured()) return fallbackCardGames;
   try {
     const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase.from('card_games').select('*').eq('active', true).order('sort_order');
-    return error ? fallbackCardGames : (data ?? []) as CardGame[];
+    const [{ data, error }, { data: media }] = await Promise.all([
+      supabase.from('card_games').select('*').eq('active', true).order('sort_order'),
+      supabase.from('media').select('id,url'),
+    ]);
+    if (error) return fallbackCardGames;
+    const mediaById = new Map((media ?? []).map((asset) => [asset.id, asset.url]));
+    return (data ?? []).map((game) => ({
+      ...game,
+      image_url: game.image_url?.startsWith('media://')
+        ? mediaById.get(game.image_url.slice('media://'.length)) || null
+        : game.image_url,
+    })) as CardGame[];
   } catch { return fallbackCardGames; }
 }
 
