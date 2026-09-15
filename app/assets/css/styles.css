@@ -452,3 +452,8 @@ body { background: var(--paper); }
   .magic-programming__intro .section-title { max-width: 100%; }
   .magic-programming__intro .section-intro, .magic-programming__announcement { line-height: 1.65; }
 }
+
+/* Forge-CT attribution */
+.forge-attribution { color: inherit; opacity: .72; }
+.forge-attribution a { color: inherit; text-underline-offset: 2px; }
+.forge-attribution a:hover, .forge-attribution a:focus-visible { color: var(--yellow); opacity: 1; }
